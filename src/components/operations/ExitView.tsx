@@ -16,6 +16,7 @@ import {
   AlertCircle,
   CreditCard
 } from 'lucide-react';
+import { logAuditEvent } from '../../lib/audit';
 import type { ParkingSession, Customer, Vehicle, AdditionalService, SessionAdditionalService } from '../../types/database';
 
 interface ExitViewProps {
@@ -24,7 +25,7 @@ interface ExitViewProps {
 }
 
 export const ExitView: React.FC<ExitViewProps> = ({ initialSessionId, onProceedToPayment }) => {
-  const { currentParkingLot } = useAuth();
+  const { currentParkingLot, organization, user } = useAuth();
 
   const [searchPlate, setSearchPlate] = useState('');
   const [activeSessions, setActiveSessions] = useState<ParkingSession[]>([]);
@@ -268,6 +269,23 @@ export const ExitView: React.FC<ExitViewProps> = ({ initialSessionId, onProceedT
         .single();
 
       if (error) throw error;
+
+      if (organization?.id && currentParkingLot?.id && user?.id) {
+        logAuditEvent({
+          organizationId: organization.id,
+          parkingLotId: currentParkingLot.id,
+          userId: user.id,
+          action: 'UPDATE',
+          entityType: 'parking_sessions',
+          entityId: updated.id,
+          metadata: {
+            description: `Salida registrada para cobro: ${updated.plate_snapshot || ''}`,
+            plate: updated.plate_snapshot,
+            total_amount: updated.total_amount,
+            lost_ticket: updated.lost_ticket,
+          },
+        });
+      }
 
       if (onProceedToPayment) {
         onProceedToPayment(updated as ParkingSession);

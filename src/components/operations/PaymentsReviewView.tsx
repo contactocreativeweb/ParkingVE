@@ -18,6 +18,7 @@ import {
   X, 
   FileText
 } from 'lucide-react';
+import { logAuditEvent } from '../../lib/audit';
 import type { Payment, ParkingSession, Customer, PaymentReceipt } from '../../types/database';
 
 interface PaymentWithDetails extends Payment {
@@ -30,7 +31,7 @@ interface PaymentsReviewViewProps {
 }
 
 export const PaymentsReviewView: React.FC<PaymentsReviewViewProps> = ({ onPaymentApproved }) => {
-  const { currentParkingLot, user } = useAuth();
+  const { currentParkingLot, organization, user } = useAuth();
 
   const [payments, setPayments] = useState<PaymentWithDetails[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -137,6 +138,23 @@ export const PaymentsReviewView: React.FC<PaymentsReviewViewProps> = ({ onPaymen
 
       if (payErr) throw payErr;
 
+      if (organization?.id && currentParkingLot?.id && user?.id) {
+        logAuditEvent({
+          organizationId: organization.id,
+          parkingLotId: currentParkingLot.id,
+          userId: user.id,
+          action: 'APPROVE',
+          entityType: 'payments',
+          entityId: payment.id,
+          metadata: {
+            description: `Pago aprobado: $${Number(payment.amount).toFixed(2)} USD`,
+            amount: payment.amount,
+            method_type: payment.method_type,
+            reference_number: payment.reference_number,
+          },
+        });
+      }
+
       // 2. Si tenía comprobante, marcarlo APPROVED
       if (payment.payment_receipts && payment.payment_receipts.length > 0) {
         await supabase
@@ -200,6 +218,23 @@ export const PaymentsReviewView: React.FC<PaymentsReviewViewProps> = ({ onPaymen
         .eq('id', rejectingPayment.id);
 
       if (payErr) throw payErr;
+
+      if (organization?.id && currentParkingLot?.id && user?.id) {
+        logAuditEvent({
+          organizationId: organization.id,
+          parkingLotId: currentParkingLot.id,
+          userId: user.id,
+          action: 'REJECT',
+          entityType: 'payments',
+          entityId: rejectingPayment.id,
+          metadata: {
+            description: `Pago rechazado: $${Number(rejectingPayment.amount).toFixed(2)} USD - Motivo: "${trimmedReason}"`,
+            amount: rejectingPayment.amount,
+            method_type: rejectingPayment.method_type,
+            rejection_reason: trimmedReason,
+          },
+        });
+      }
 
       // 2. Marcar comprobante REJECTED
       if (rejectingPayment.payment_receipts && rejectingPayment.payment_receipts.length > 0) {

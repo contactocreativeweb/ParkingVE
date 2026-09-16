@@ -14,6 +14,7 @@ import {
   Sparkles,
   Mail
 } from 'lucide-react';
+import { logAuditEvent } from '../../lib/audit';
 import type { 
   ParkingSession, 
   PaymentMethod, 
@@ -27,7 +28,7 @@ interface PaymentViewProps {
 }
 
 export const PaymentView: React.FC<PaymentViewProps> = ({ initialSession, onPaymentRegistered }) => {
-  const { currentParkingLot, user } = useAuth();
+  const { currentParkingLot, organization, user } = useAuth();
 
   const [activePendingSessions, setActivePendingSessions] = useState<ParkingSession[]>([]);
   const [selectedSession, setSelectedSession] = useState<ParkingSession | null>(initialSession || null);
@@ -258,6 +259,24 @@ export const PaymentView: React.FC<PaymentViewProps> = ({ initialSession, onPaym
         .single();
 
       if (payErr) throw payErr;
+
+      if (organization?.id && currentParkingLot?.id && user?.id) {
+        logAuditEvent({
+          organizationId: organization.id,
+          parkingLotId: currentParkingLot.id,
+          userId: user.id,
+          action: 'INSERT',
+          entityType: 'payments',
+          entityId: paymentData.id,
+          metadata: {
+            description: `Pago registrado: $${amount.toFixed(2)} USD (${selectedMethodType}) - ${initialStatus}`,
+            amount,
+            method_type: selectedMethodType,
+            status: initialStatus,
+            session_id: selectedSession.id,
+          },
+        });
+      }
 
       // 3. Crear enlace de pago público con token aleatorio hash (Reglas 25 y 45)
       const randomBytes = new Uint8Array(16);

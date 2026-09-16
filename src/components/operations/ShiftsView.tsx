@@ -15,6 +15,7 @@ import {
   LogOut,
   TrendingUp,
 } from 'lucide-react';
+import { logAuditEvent } from '../../lib/audit';
 import type { Shift } from '../../types/database';
 
 interface ShiftWithTotals extends Shift {
@@ -26,7 +27,7 @@ interface ShiftWithTotals extends Shift {
 }
 
 export const ShiftsView: React.FC = () => {
-  const { currentParkingLot, user, role } = useAuth();
+  const { currentParkingLot, organization, user, role } = useAuth();
 
   const [activeShift, setActiveShift] = useState<ShiftWithTotals | null>(null);
   const [recentShifts, setRecentShifts] = useState<ShiftWithTotals[]>([]);
@@ -138,6 +139,21 @@ export const ShiftsView: React.FC = () => {
         notes: null,
       });
       if (error) throw error;
+
+      if (organization?.id && currentParkingLot?.id && user?.id) {
+        logAuditEvent({
+          organizationId: organization.id,
+          parkingLotId: currentParkingLot.id,
+          userId: user.id,
+          action: 'INSERT',
+          entityType: 'shifts',
+          metadata: {
+            description: `Apertura de turno con fondo de $${cashVal.toFixed(2)} USD`,
+            opening_cash: cashVal,
+          },
+        });
+      }
+
       setSuccessMsg('Turno abierto exitosamente.');
       setOpeningCash('');
       await loadShiftData();
@@ -176,6 +192,23 @@ export const ShiftsView: React.FC = () => {
         .eq('id', activeShift.id);
 
       if (error) throw error;
+
+      if (organization?.id && currentParkingLot?.id && user?.id) {
+        logAuditEvent({
+          organizationId: organization.id,
+          parkingLotId: currentParkingLot.id,
+          userId: user.id,
+          action: 'UPDATE',
+          entityType: 'shifts',
+          entityId: activeShift.id,
+          metadata: {
+            description: `Cierre de turno: Declarado $${declared.toFixed(2)}, Esperado $${expected.toFixed(2)}, Dif: $${difference.toFixed(2)} USD`,
+            declared_cash: declared,
+            expected_cash: expected,
+            difference,
+          },
+        });
+      }
       setSuccessMsg(`Turno cerrado. Diferencia de caja: $${difference.toFixed(2)} USD.`);
       setDeclaredCash('');
       setCloseNotes('');

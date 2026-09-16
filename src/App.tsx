@@ -16,13 +16,9 @@ import { PaymentsReviewView } from './components/operations/PaymentsReviewView';
 import { ReceiptView } from './components/operations/ReceiptView';
 import { ShiftsView } from './components/operations/ShiftsView';
 import { ReportsView } from './components/operations/ReportsView';
+import { AuditLogView } from './components/operations/AuditLogView';
+import { DashboardMVP } from './components/dashboard/DashboardMVP';
 import { 
-  ShieldCheck, 
-  Building2, 
-  MapPin, 
-  UserCheck, 
-  Sparkles, 
-  ArrowRight,
   Settings,
   DollarSign,
   Layers,
@@ -36,7 +32,8 @@ import {
   ClipboardList,
   FileCheck,
   Vault,
-  BarChart3
+  BarChart3,
+  ScrollText
 } from 'lucide-react';
 import type { ParkingSession } from './types/database';
 
@@ -54,11 +51,12 @@ type TabType =
   | 'payments-review'
   | 'receipts'
   | 'shifts'
-  | 'reports';
+  | 'reports'
+  | 'audit';
 
 const MainLayout: React.FC = () => {
-  const { user, organization, role, currentParkingLot, loading } = useAuth();
-  const [activeTab, setActiveTab] = useState<TabType>('payments-review');
+  const { user, organization, loading } = useAuth();
+  const [activeTab, setActiveTab] = useState<TabType>('dashboard');
   const [selectedExitSessionId, setSelectedExitSessionId] = useState<string | null>(null);
   const [paymentSession, setPaymentSession] = useState<ParkingSession | null>(null);
   const [uploadPaymentId, setUploadPaymentId] = useState<string | null>(null);
@@ -140,6 +138,49 @@ const MainLayout: React.FC = () => {
           gap: '0.75rem',
           overflowX: 'auto',
         }}>
+          <button
+            type="button"
+            onClick={() => setActiveTab('dashboard')}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              padding: '0.5rem 0.95rem',
+              borderRadius: 'var(--radius-md)',
+              fontSize: '0.875rem',
+              fontWeight: 800,
+              cursor: 'pointer',
+              border: 'none',
+              backgroundColor: activeTab === 'dashboard' ? 'var(--accent-primary)' : 'var(--bg-input)',
+              color: activeTab === 'dashboard' ? '#ffffff' : 'var(--text-primary)',
+              boxShadow: activeTab === 'dashboard' ? 'var(--shadow-md)' : 'none',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <LayoutDashboard size={16} /> Dashboard (MVP)
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('audit')}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              padding: '0.5rem 0.9rem',
+              borderRadius: 'var(--radius-md)',
+              fontSize: '0.875rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              border: 'none',
+              backgroundColor: activeTab === 'audit' ? 'var(--bg-badge)' : 'transparent',
+              color: activeTab === 'audit' ? 'var(--accent-primary)' : 'var(--text-secondary)',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <ScrollText size={16} /> Auditoría (Fase 17)
+          </button>
+
           <button
             type="button"
             onClick={() => setActiveTab('reports')}
@@ -412,33 +453,16 @@ const MainLayout: React.FC = () => {
           >
             <Settings size={16} /> Mi Estacionamiento (Fase 4)
           </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('dashboard')}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.45rem',
-              padding: '0.5rem 0.9rem',
-              borderRadius: 'var(--radius-md)',
-              fontSize: '0.875rem',
-              fontWeight: 600,
-              cursor: 'pointer',
-              border: 'none',
-              backgroundColor: activeTab === 'dashboard' ? 'var(--bg-badge)' : 'transparent',
-              color: activeTab === 'dashboard' ? 'var(--accent-primary)' : 'var(--text-secondary)',
-              transition: 'all 0.15s ease',
-            }}
-          >
-            <LayoutDashboard size={16} /> Resumen General
-          </button>
         </div>
       </nav>
 
       <main style={{ flex: 1, padding: '2rem 1.25rem' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           
+          {activeTab === 'audit' && (
+            <AuditLogView />
+          )}
+
           {activeTab === 'reports' && (
             <ReportsView />
           )}
@@ -518,145 +542,7 @@ const MainLayout: React.FC = () => {
           )}
 
           {activeTab === 'dashboard' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-              
-              {/* Bienvenida y Estado del Aislamiento */}
-              <div style={{
-                padding: '2rem',
-                backgroundColor: 'var(--bg-card)',
-                borderRadius: 'var(--radius-lg)',
-                border: '1px solid var(--border-subtle)',
-                boxShadow: 'var(--shadow-md)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '1.25rem',
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
-                  <div>
-                    <span className="badge badge-operator" style={{ marginBottom: '0.5rem' }}>
-                      <ShieldCheck size={14} /> FASES 3 A 16 OPERATIVAS
-                    </span>
-                    <h1 style={{ fontSize: '1.85rem', margin: '0.25rem 0' }}>
-                      Espacio de Trabajo Conectado
-                    </h1>
-                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
-                      Reportes financieros y operativos con filtros por período, desglose por método de pago y distribución de vehículos.
-                    </p>
-                  </div>
-
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.75rem',
-                    padding: '0.75rem 1rem',
-                    backgroundColor: 'var(--bg-input)',
-                    borderRadius: 'var(--radius-md)',
-                    border: '1px solid var(--border-subtle)',
-                  }}>
-                    <div style={{
-                      width: '10px',
-                      height: '10px',
-                      borderRadius: '50%',
-                      backgroundColor: 'var(--status-success)',
-                      boxShadow: '0 0 10px var(--status-success)',
-                    }} />
-                    <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>PWA En línea & Instalable</span>
-                  </div>
-                </div>
-
-                {/* Tarjetas de Contexto Activo: Usuario -> Organización -> Estacionamiento -> Rol */}
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-                  gap: '1rem',
-                  marginTop: '0.5rem',
-                }}>
-                  <div style={{
-                    padding: '1.25rem',
-                    backgroundColor: 'var(--bg-input)',
-                    borderRadius: 'var(--radius-md)',
-                    border: '1px solid var(--border-subtle)',
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
-                      <Building2 size={16} />
-                      <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>Empresa</span>
-                    </div>
-                    <div style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--text-primary)' }}>
-                      {organization.name}
-                    </div>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
-                      País: {organization.country_code} • Moneda: {organization.currency_code}
-                    </div>
-                  </div>
-
-                  <div style={{
-                    padding: '1.25rem',
-                    backgroundColor: 'var(--bg-input)',
-                    borderRadius: 'var(--radius-md)',
-                    border: '1px solid var(--border-subtle)',
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
-                      <MapPin size={16} />
-                      <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>Sede Activa</span>
-                    </div>
-                    <div style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--text-primary)' }}>
-                      {currentParkingLot ? currentParkingLot.name : 'Sin sede asignada'}
-                    </div>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
-                      Timezone: {currentParkingLot?.timezone || 'America/Caracas'}
-                    </div>
-                  </div>
-
-                  <div style={{
-                    padding: '1.25rem',
-                    backgroundColor: 'var(--bg-input)',
-                    borderRadius: 'var(--radius-md)',
-                    border: '1px solid var(--border-subtle)',
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
-                      <UserCheck size={16} />
-                      <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>Nivel de Acceso</span>
-                    </div>
-                    <div style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--text-primary)' }}>
-                      Rol: {role}
-                    </div>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
-                      {role === 'OWNER' && 'Control total de la organización y sedes'}
-                      {role === 'ADMIN' && 'Administración operativa y tarifas'}
-                      {role === 'OPERATOR' && 'Operaciones rápidas de entrada y salida'}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Siguiente Fase en el Documento Maestro */}
-              <div style={{
-                padding: '1.75rem',
-                backgroundColor: 'var(--bg-card)',
-                borderRadius: 'var(--radius-lg)',
-                border: '1px dashed var(--accent-primary)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                flexWrap: 'wrap',
-                gap: '1rem',
-              }}>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                    <Sparkles size={18} color="var(--accent-primary)" />
-                    <span style={{ fontWeight: 700, fontSize: '1.05rem' }}>Siguiente etapa: FASE 17 — Auditoría</span>
-                  </div>
-                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-                    Registro automático de acciones críticas en audit_logs con visor de historial.
-                  </p>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent-primary)', fontWeight: 600, fontSize: '0.9rem' }}>
-                  <span>Preparado</span>
-                  <ArrowRight size={16} />
-                </div>
-              </div>
-
-            </div>
+            <DashboardMVP onNavigate={(tab) => setActiveTab(tab)} />
           )}
 
         </div>

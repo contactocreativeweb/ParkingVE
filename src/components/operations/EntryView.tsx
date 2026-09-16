@@ -11,10 +11,11 @@ import {
   Search, 
   UserCheck
 } from 'lucide-react';
+import { logAuditEvent } from '../../lib/audit';
 import type { VehicleType, Vehicle, Customer, ParkingSession } from '../../types/database';
 
 export const EntryView: React.FC = () => {
-  const { currentParkingLot, user } = useAuth();
+  const { currentParkingLot, organization, user } = useAuth();
 
   const [plateInput, setPlateInput] = useState('');
   const [vehicleType, setVehicleType] = useState<VehicleType>('CAR');
@@ -220,6 +221,23 @@ export const EntryView: React.FC = () => {
         .single();
 
       if (sessionErr) throw sessionErr;
+
+      // Registrar auditoría (Fase 17)
+      if (organization?.id) {
+        logAuditEvent({
+          organizationId: organization.id,
+          parkingLotId: currentParkingLot.id,
+          userId: user.id,
+          action: 'INSERT',
+          entityType: 'parking_sessions',
+          entityId: sessionData.id,
+          metadata: {
+            description: `Entrada: ${cleanPlate} (${vehicleType === 'CAR' ? 'Carro' : 'Moto'})`,
+            plate: cleanPlate,
+            vehicle_type: vehicleType,
+          },
+        });
+      }
 
       // Éxito: Mostrar ticket / notificación
       const custDisplay = existingCustomer 
