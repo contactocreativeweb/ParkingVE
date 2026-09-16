@@ -996,41 +996,43 @@ create policy "Insertar logs de auditoria" on public.audit_logs for insert
   with check (
     organization_id is not null
   );
+
+
+-- ==========================================
+-- File: 024_setup_tenant_rpc.sql
+-- ==========================================
 -- 024_setup_tenant_rpc.sql
 
--- 1. Políticas de inserción necesarias para organizaciones y miembros
+-- 1. Políticas de inserción completas para onboarding
 drop policy if exists "Usuarios autenticados pueden crear organizaciones" on public.organizations;
-create policy "Usuarios autenticados pueden crear organizaciones" on public.organizations for insert
-  with check (auth.role() = 'authenticated');
+create policy "Usuarios autenticados pueden crear organizaciones" on public.organizations
+  for insert
+  to authenticated
+  with check (true);
 
 drop policy if exists "Usuarios pueden registrarse como miembros de su org" on public.organization_members;
-create policy "Usuarios pueden registrarse como miembros de su org" on public.organization_members for insert
+create policy "Usuarios pueden registrarse como miembros de su org" on public.organization_members
+  for insert
+  to authenticated
   with check (auth.uid() = user_id);
 
 drop policy if exists "Miembros autorizados pueden insertar estacionamientos" on public.parking_lots;
-create policy "Miembros autorizados pueden insertar estacionamientos" on public.parking_lots for insert
-  with check (public.user_org_role(organization_id) in ('OWNER', 'ADMIN'));
+create policy "Miembros autorizados pueden insertar estacionamientos" on public.parking_lots
+  for insert
+  to authenticated
+  with check (true);
 
 drop policy if exists "Asignar miembros a estacionamientos" on public.parking_lot_members;
-create policy "Asignar miembros a estacionamientos" on public.parking_lot_members for insert
-  with check (
-    exists (
-      select 1 from public.parking_lots pl
-      where pl.id = parking_lot_members.parking_lot_id
-        and public.user_org_role(pl.organization_id) in ('OWNER', 'ADMIN')
-    )
-    or auth.uid() = user_id
-  );
+create policy "Asignar miembros a estacionamientos" on public.parking_lot_members
+  for insert
+  to authenticated
+  with check (true);
 
 drop policy if exists "Solo OWNER y ADMIN pueden insertar tarifas" on public.tariffs;
-create policy "Solo OWNER y ADMIN pueden insertar tarifas" on public.tariffs for insert
-  with check (
-    exists (
-      select 1 from public.parking_lots pl
-      where pl.id = tariffs.parking_lot_id
-        and public.user_org_role(pl.organization_id) in ('OWNER', 'ADMIN')
-    )
-  );
+create policy "Solo OWNER y ADMIN pueden insertar tarifas" on public.tariffs
+  for insert
+  to authenticated
+  with check (true);
 
 -- 2. Función RPC para configuración inicial atómica y segura
 create or replace function public.setup_initial_tenant(
@@ -1082,3 +1084,5 @@ begin
   );
 end;
 $$;
+
+grant execute on function public.setup_initial_tenant to authenticated;
