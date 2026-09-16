@@ -5,6 +5,7 @@ import { UserHeader } from './components/auth/UserHeader';
 import { TenantSetup } from './components/auth/TenantSetup';
 import { ParkingLotSettings } from './components/settings/ParkingLotSettings';
 import { TariffSettings } from './components/settings/TariffSettings';
+import { AdditionalServicesSettings } from './components/settings/AdditionalServicesSettings';
 import { 
   ShieldCheck, 
   Building2, 
@@ -14,14 +15,15 @@ import {
   ArrowRight,
   Settings,
   DollarSign,
+  Layers,
   LayoutDashboard
 } from 'lucide-react';
 
-type TabType = 'dashboard' | 'parking-settings' | 'tariffs';
+type TabType = 'dashboard' | 'parking-settings' | 'tariffs' | 'services';
 
 const MainLayout: React.FC = () => {
   const { user, organization, role, currentParkingLot, loading } = useAuth();
-  const [activeTab, setActiveTab] = useState<TabType>('tariffs');
+  const [activeTab, setActiveTab] = useState<TabType>('services');
 
   if (loading) {
     return (
@@ -102,6 +104,27 @@ const MainLayout: React.FC = () => {
         }}>
           <button
             type="button"
+            onClick={() => setActiveTab('services')}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              padding: '0.5rem 0.9rem',
+              borderRadius: 'var(--radius-md)',
+              fontSize: '0.875rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+              border: 'none',
+              backgroundColor: activeTab === 'services' ? 'var(--bg-badge)' : 'transparent',
+              color: activeTab === 'services' ? 'var(--accent-primary)' : 'var(--text-secondary)',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <Layers size={16} /> Servicios (Fase 6)
+          </button>
+
+          <button
+            type="button"
             onClick={() => setActiveTab('tariffs')}
             style={{
               display: 'inline-flex',
@@ -168,6 +191,10 @@ const MainLayout: React.FC = () => {
       <main style={{ flex: 1, padding: '2rem 1.25rem' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           
+          {activeTab === 'services' && (
+            <AdditionalServicesSettings />
+          )}
+
           {activeTab === 'tariffs' && (
             <TariffSettings />
           )}
@@ -193,13 +220,13 @@ const MainLayout: React.FC = () => {
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
                   <div>
                     <span className="badge badge-operator" style={{ marginBottom: '0.5rem' }}>
-                      <ShieldCheck size={14} /> FASES 3, 4 & 5 OPERATIVAS
+                      <ShieldCheck size={14} /> FASES 3 A 6 OPERATIVAS
                     </span>
                     <h1 style={{ fontSize: '1.85rem', margin: '0.25rem 0' }}>
                       Espacio de Trabajo Conectado
                     </h1>
                     <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
-                      Sesión validada con Supabase Auth. Aislamiento multi-tenant y tarifas activas en BD.
+                      Sesión validada con Supabase Auth. Aislamiento multi-tenant, tarifas y servicios configurables.
                     </p>
                   </div>
 
@@ -303,10 +330,10 @@ const MainLayout: React.FC = () => {
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
                     <Sparkles size={18} color="var(--accent-primary)" />
-                    <span style={{ fontWeight: 700, fontSize: '1.05rem' }}>Siguiente etapa: FASE 6 — Servicios Adicionales</span>
+                    <span style={{ fontWeight: 700, fontSize: '1.05rem' }}>Siguiente etapa: FASE 7 — Clientes</span>
                   </div>
                   <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-                    Administración de servicios opcionales (Casco, Lavado, etc.) con precios en USD y activación/desactivación.
+                    Administración de clientes independientes por estacionamiento con búsqueda por nombre, teléfono, email y matrícula.
                   </p>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent-primary)', fontWeight: 600, fontSize: '0.9rem' }}>
