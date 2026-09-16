@@ -18,7 +18,22 @@ export const TenantSetup: React.FC = () => {
     setError(null);
 
     try {
-      // 1. Crear Organización
+      // 1. Intentar creación atómica mediante RPC (Recomendado y seguro contra RLS)
+      const { error: rpcErr } = await supabase.rpc('setup_initial_tenant', {
+        p_org_name: orgName.trim(),
+        p_parking_name: parkingName.trim() || 'Sede Principal',
+        p_address: address.trim() || null,
+      });
+
+      if (!rpcErr) {
+        // Creado exitosamente mediante RPC
+        await refreshTenantContext();
+        return;
+      }
+
+      console.warn('RPC setup_initial_tenant not available or failed, falling back to direct inserts:', rpcErr);
+
+      // 2. Fallback: Creación directa tabla por tabla
       const { data: orgData, error: orgErr } = await supabase
         .from('organizations')
         .insert({
@@ -33,7 +48,6 @@ export const TenantSetup: React.FC = () => {
 
       if (orgErr) throw orgErr;
 
-      // 2. Asociar Usuario como OWNER
       const { error: memberErr } = await supabase
         .from('organization_members')
         .insert({
@@ -45,7 +59,6 @@ export const TenantSetup: React.FC = () => {
 
       if (memberErr) throw memberErr;
 
-      // 3. Crear el primer Estacionamiento
       const { data: parkingData, error: parkingErr } = await supabase
         .from('parking_lots')
         .insert({
@@ -61,13 +74,11 @@ export const TenantSetup: React.FC = () => {
 
       if (parkingErr) throw parkingErr;
 
-      // 4. Asignar usuario al estacionamiento
       await supabase.from('parking_lot_members').insert({
         parking_lot_id: parkingData.id,
         user_id: user.id,
       });
 
-      // 5. Crear tarifas por defecto (Carro y Moto) según la regla de la guía
       await supabase.from('tariffs').insert([
         {
           parking_lot_id: parkingData.id,
@@ -87,7 +98,6 @@ export const TenantSetup: React.FC = () => {
         },
       ]);
 
-      // Refrescar el estado global de autenticación
       await refreshTenantContext();
     } catch (err: any) {
       console.error('Error during tenant setup:', err);
