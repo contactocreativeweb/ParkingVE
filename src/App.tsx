@@ -6,6 +6,7 @@ import { TenantSetup } from './components/auth/TenantSetup';
 import { ParkingLotSettings } from './components/settings/ParkingLotSettings';
 import { TariffSettings } from './components/settings/TariffSettings';
 import { AdditionalServicesSettings } from './components/settings/AdditionalServicesSettings';
+import { CustomersView } from './components/customers/CustomersView';
 import { 
   ShieldCheck, 
   Building2, 
@@ -16,14 +17,15 @@ import {
   Settings,
   DollarSign,
   Layers,
+  Users,
   LayoutDashboard
 } from 'lucide-react';
 
-type TabType = 'dashboard' | 'parking-settings' | 'tariffs' | 'services';
+type TabType = 'dashboard' | 'parking-settings' | 'tariffs' | 'services' | 'customers';
 
 const MainLayout: React.FC = () => {
   const { user, organization, role, currentParkingLot, loading } = useAuth();
-  const [activeTab, setActiveTab] = useState<TabType>('services');
+  const [activeTab, setActiveTab] = useState<TabType>('customers');
 
   if (loading) {
     return (
@@ -102,6 +104,27 @@ const MainLayout: React.FC = () => {
           gap: '0.75rem',
           overflowX: 'auto',
         }}>
+          <button
+            type="button"
+            onClick={() => setActiveTab('customers')}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              padding: '0.5rem 0.9rem',
+              borderRadius: 'var(--radius-md)',
+              fontSize: '0.875rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+              border: 'none',
+              backgroundColor: activeTab === 'customers' ? 'var(--bg-badge)' : 'transparent',
+              color: activeTab === 'customers' ? 'var(--accent-primary)' : 'var(--text-secondary)',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <Users size={16} /> Clientes (Fase 7)
+          </button>
+
           <button
             type="button"
             onClick={() => setActiveTab('services')}
@@ -191,6 +214,10 @@ const MainLayout: React.FC = () => {
       <main style={{ flex: 1, padding: '2rem 1.25rem' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           
+          {activeTab === 'customers' && (
+            <CustomersView />
+          )}
+
           {activeTab === 'services' && (
             <AdditionalServicesSettings />
           )}
@@ -220,13 +247,13 @@ const MainLayout: React.FC = () => {
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
                   <div>
                     <span className="badge badge-operator" style={{ marginBottom: '0.5rem' }}>
-                      <ShieldCheck size={14} /> FASES 3 A 6 OPERATIVAS
+                      <ShieldCheck size={14} /> FASES 3 A 7 OPERATIVAS
                     </span>
                     <h1 style={{ fontSize: '1.85rem', margin: '0.25rem 0' }}>
                       Espacio de Trabajo Conectado
                     </h1>
                     <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
-                      Sesión validada con Supabase Auth. Aislamiento multi-tenant, tarifas y servicios configurables.
+                      Sesión validada con Supabase Auth. Base de clientes y vehículos locales por estacionamiento.
                     </p>
                   </div>
 
@@ -330,10 +357,10 @@ const MainLayout: React.FC = () => {
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
                     <Sparkles size={18} color="var(--accent-primary)" />
-                    <span style={{ fontWeight: 700, fontSize: '1.05rem' }}>Siguiente etapa: FASE 7 — Clientes</span>
+                    <span style={{ fontWeight: 700, fontSize: '1.05rem' }}>Siguiente etapa: FASE 8 — Registro de Entrada</span>
                   </div>
                   <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-                    Administración de clientes independientes por estacionamiento con búsqueda por nombre, teléfono, email y matrícula.
+                    Pantalla ultra-rápida orientada a menos clics: Búsqueda/ingreso de Matrícula, selección Carro/Moto, asignación ágil de cliente y entrada inmediata.
                   </p>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent-primary)', fontWeight: 600, fontSize: '0.9rem' }}>
