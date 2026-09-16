@@ -10,6 +10,7 @@ import { CustomersView } from './components/customers/CustomersView';
 import { EntryView } from './components/operations/EntryView';
 import { ActiveVehiclesView } from './components/operations/ActiveVehiclesView';
 import { ExitView } from './components/operations/ExitView';
+import { PaymentView } from './components/operations/PaymentView';
 import { 
   ShieldCheck, 
   Building2, 
@@ -24,15 +25,18 @@ import {
   LogIn,
   LogOut,
   Car,
+  CreditCard,
   LayoutDashboard
 } from 'lucide-react';
+import type { ParkingSession } from './types/database';
 
-type TabType = 'dashboard' | 'parking-settings' | 'tariffs' | 'services' | 'customers' | 'entry' | 'active-vehicles' | 'exit';
+type TabType = 'dashboard' | 'parking-settings' | 'tariffs' | 'services' | 'customers' | 'entry' | 'active-vehicles' | 'exit' | 'payment';
 
 const MainLayout: React.FC = () => {
   const { user, organization, role, currentParkingLot, loading } = useAuth();
-  const [activeTab, setActiveTab] = useState<TabType>('exit');
+  const [activeTab, setActiveTab] = useState<TabType>('payment');
   const [selectedExitSessionId, setSelectedExitSessionId] = useState<string | null>(null);
+  const [paymentSession, setPaymentSession] = useState<ParkingSession | null>(null);
 
   if (loading) {
     return (
@@ -113,7 +117,7 @@ const MainLayout: React.FC = () => {
         }}>
           <button
             type="button"
-            onClick={() => setActiveTab('exit')}
+            onClick={() => setActiveTab('payment')}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -122,6 +126,27 @@ const MainLayout: React.FC = () => {
               borderRadius: 'var(--radius-md)',
               fontSize: '0.875rem',
               fontWeight: 700,
+              cursor: 'pointer',
+              border: 'none',
+              backgroundColor: activeTab === 'payment' ? 'var(--bg-badge)' : 'transparent',
+              color: activeTab === 'payment' ? 'var(--accent-primary)' : 'var(--text-secondary)',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <CreditCard size={16} /> Cobro / Pago (Fase 11)
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('exit')}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              padding: '0.5rem 0.9rem',
+              borderRadius: 'var(--radius-md)',
+              fontSize: '0.875rem',
+              fontWeight: 600,
               cursor: 'pointer',
               border: 'none',
               backgroundColor: activeTab === 'exit' ? 'var(--bg-badge)' : 'transparent',
@@ -284,11 +309,21 @@ const MainLayout: React.FC = () => {
       <main style={{ flex: 1, padding: '2rem 1.25rem' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           
+          {activeTab === 'payment' && (
+            <PaymentView
+              initialSession={paymentSession}
+              onPaymentRegistered={(payId, token) => {
+                console.log('Pago registrado:', payId, 'Token:', token);
+              }}
+            />
+          )}
+
           {activeTab === 'exit' && (
             <ExitView
               initialSessionId={selectedExitSessionId}
               onProceedToPayment={(sess) => {
-                console.log('Proceder a pagar sesión:', sess.id);
+                setPaymentSession(sess);
+                setActiveTab('payment');
               }}
             />
           )}
@@ -339,13 +374,13 @@ const MainLayout: React.FC = () => {
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
                   <div>
                     <span className="badge badge-operator" style={{ marginBottom: '0.5rem' }}>
-                      <ShieldCheck size={14} /> FASES 3 A 10 OPERATIVAS
+                      <ShieldCheck size={14} /> FASES 3 A 11 OPERATIVAS
                     </span>
                     <h1 style={{ fontSize: '1.85rem', margin: '0.25rem 0' }}>
                       Espacio de Trabajo Conectado
                     </h1>
                     <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
-                      Módulos de Entrada, Monitoreo de Vehículos Activos y Salida con Liquidación listos.
+                      Módulo de Pagos con soporte para Pago Móvil, POS, Efectivo y Enlaces Hash públicos activo.
                     </p>
                   </div>
 
@@ -449,10 +484,10 @@ const MainLayout: React.FC = () => {
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
                     <Sparkles size={18} color="var(--accent-primary)" />
-                    <span style={{ fontWeight: 700, fontSize: '1.05rem' }}>Siguiente etapa: FASE 11 — Métodos de Pago</span>
+                    <span style={{ fontWeight: 700, fontSize: '1.05rem' }}>Siguiente etapa: FASE 12 — Comprobante</span>
                   </div>
                   <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-                    Selección de método de pago (Efectivo, Punto de venta, Pago Móvil, Transferencia) y desglose de datos bancarios para Pago Móvil.
+                    Subida y validación de comprobante de pago (JPG, JPEG, PNG, WEBP, PDF) por parte del cliente o del operador en bucket privado Supabase Storage.
                   </p>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent-primary)', fontWeight: 600, fontSize: '0.9rem' }}>
