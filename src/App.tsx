@@ -12,6 +12,7 @@ import { ActiveVehiclesView } from './components/operations/ActiveVehiclesView';
 import { ExitView } from './components/operations/ExitView';
 import { PaymentView } from './components/operations/PaymentView';
 import { ReceiptUploadView } from './components/operations/ReceiptUploadView';
+import { PaymentsReviewView } from './components/operations/PaymentsReviewView';
 import { 
   ShieldCheck, 
   Building2, 
@@ -28,7 +29,8 @@ import {
   Car,
   CreditCard,
   UploadCloud,
-  LayoutDashboard
+  LayoutDashboard,
+  ClipboardList
 } from 'lucide-react';
 import type { ParkingSession } from './types/database';
 
@@ -42,11 +44,12 @@ type TabType =
   | 'active-vehicles' 
   | 'exit' 
   | 'payment'
-  | 'receipts-upload';
+  | 'receipts-upload'
+  | 'payments-review';
 
 const MainLayout: React.FC = () => {
   const { user, organization, role, currentParkingLot, loading } = useAuth();
-  const [activeTab, setActiveTab] = useState<TabType>('receipts-upload');
+  const [activeTab, setActiveTab] = useState<TabType>('payments-review');
   const [selectedExitSessionId, setSelectedExitSessionId] = useState<string | null>(null);
   const [paymentSession, setPaymentSession] = useState<ParkingSession | null>(null);
   const [uploadPaymentId, setUploadPaymentId] = useState<string | null>(null);
@@ -130,7 +133,7 @@ const MainLayout: React.FC = () => {
         }}>
           <button
             type="button"
-            onClick={() => setActiveTab('receipts-upload')}
+            onClick={() => setActiveTab('payments-review')}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -139,6 +142,27 @@ const MainLayout: React.FC = () => {
               borderRadius: 'var(--radius-md)',
               fontSize: '0.875rem',
               fontWeight: 700,
+              cursor: 'pointer',
+              border: 'none',
+              backgroundColor: activeTab === 'payments-review' ? 'var(--bg-badge)' : 'transparent',
+              color: activeTab === 'payments-review' ? 'var(--accent-primary)' : 'var(--text-secondary)',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <ClipboardList size={16} /> Revisión (Fase 13)
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('receipts-upload')}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              padding: '0.5rem 0.9rem',
+              borderRadius: 'var(--radius-md)',
+              fontSize: '0.875rem',
+              fontWeight: 600,
               cursor: 'pointer',
               border: 'none',
               backgroundColor: activeTab === 'receipts-upload' ? 'var(--bg-badge)' : 'transparent',
@@ -343,6 +367,14 @@ const MainLayout: React.FC = () => {
       <main style={{ flex: 1, padding: '2rem 1.25rem' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           
+          {activeTab === 'payments-review' && (
+            <PaymentsReviewView
+              onPaymentApproved={(_pay) => {
+                // Fase 14: navegar a recibo generado
+              }}
+            />
+          )}
+
           {activeTab === 'receipts-upload' && (
             <ReceiptUploadView
               initialPaymentId={uploadPaymentId}
@@ -418,13 +450,13 @@ const MainLayout: React.FC = () => {
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
                   <div>
                     <span className="badge badge-operator" style={{ marginBottom: '0.5rem' }}>
-                      <ShieldCheck size={14} /> FASES 3 A 12 OPERATIVAS
+                      <ShieldCheck size={14} /> FASES 3 A 13 OPERATIVAS
                     </span>
                     <h1 style={{ fontSize: '1.85rem', margin: '0.25rem 0' }}>
                       Espacio de Trabajo Conectado
                     </h1>
                     <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
-                      Módulo de Carga y Validación de Comprobantes cifrados activo en Supabase Storage.
+                      Dashboard de revisión de pagos con aprobación/rechazo y módulo de comprobantes cifrados en Supabase Storage.
                     </p>
                   </div>
 
@@ -528,10 +560,10 @@ const MainLayout: React.FC = () => {
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
                     <Sparkles size={18} color="var(--accent-primary)" />
-                    <span style={{ fontWeight: 700, fontSize: '1.05rem' }}>Siguiente etapa: FASE 13 — Revisión de Pagos</span>
+                    <span style={{ fontWeight: 700, fontSize: '1.05rem' }}>Siguiente etapa: FASE 14 — Recibo de Pago</span>
                   </div>
                   <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-                    Dashboard de Pagos Pendientes con visualizador de comprobante, acciones de APROBAR o RECHAZAR (con motivo obligatorio si es rechazado) y actualización de estados.
+                    Generación y visualización de recibo oficial de pago (receipt_number secuencial) tras aprobar el comprobante. Vista/impresión/compartir.
                   </p>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent-primary)', fontWeight: 600, fontSize: '0.9rem' }}>
