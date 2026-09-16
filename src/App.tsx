@@ -15,6 +15,7 @@ import { ReceiptUploadView } from './components/operations/ReceiptUploadView';
 import { PaymentsReviewView } from './components/operations/PaymentsReviewView';
 import { ReceiptView } from './components/operations/ReceiptView';
 import { ShiftsView } from './components/operations/ShiftsView';
+import { ReportsView } from './components/operations/ReportsView';
 import { 
   ShieldCheck, 
   Building2, 
@@ -34,7 +35,8 @@ import {
   LayoutDashboard,
   ClipboardList,
   FileCheck,
-  Vault
+  Vault,
+  BarChart3
 } from 'lucide-react';
 import type { ParkingSession } from './types/database';
 
@@ -51,7 +53,8 @@ type TabType =
   | 'receipts-upload'
   | 'payments-review'
   | 'receipts'
-  | 'shifts';
+  | 'shifts'
+  | 'reports';
 
 const MainLayout: React.FC = () => {
   const { user, organization, role, currentParkingLot, loading } = useAuth();
@@ -137,6 +140,27 @@ const MainLayout: React.FC = () => {
           gap: '0.75rem',
           overflowX: 'auto',
         }}>
+          <button
+            type="button"
+            onClick={() => setActiveTab('reports')}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              padding: '0.5rem 0.9rem',
+              borderRadius: 'var(--radius-md)',
+              fontSize: '0.875rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              border: 'none',
+              backgroundColor: activeTab === 'reports' ? 'var(--bg-badge)' : 'transparent',
+              color: activeTab === 'reports' ? 'var(--accent-primary)' : 'var(--text-secondary)',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <BarChart3 size={16} /> Reportes (Fase 16)
+          </button>
+
           <button
             type="button"
             onClick={() => setActiveTab('shifts')}
@@ -415,6 +439,10 @@ const MainLayout: React.FC = () => {
       <main style={{ flex: 1, padding: '2rem 1.25rem' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           
+          {activeTab === 'reports' && (
+            <ReportsView />
+          )}
+
           {activeTab === 'shifts' && (
             <ShiftsView />
           )}
@@ -506,13 +534,13 @@ const MainLayout: React.FC = () => {
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
                   <div>
                     <span className="badge badge-operator" style={{ marginBottom: '0.5rem' }}>
-                      <ShieldCheck size={14} /> FASES 3 A 15 OPERATIVAS
+                      <ShieldCheck size={14} /> FASES 3 A 16 OPERATIVAS
                     </span>
                     <h1 style={{ fontSize: '1.85rem', margin: '0.25rem 0' }}>
                       Espacio de Trabajo Conectado
                     </h1>
                     <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
-                      Caja operativa: apertura/cierre de turnos, arqueo de efectivo, desglose por método de pago.
+                      Reportes financieros y operativos con filtros por período, desglose por método de pago y distribución de vehículos.
                     </p>
                   </div>
 
@@ -616,10 +644,10 @@ const MainLayout: React.FC = () => {
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
                     <Sparkles size={18} color="var(--accent-primary)" />
-                    <span style={{ fontWeight: 700, fontSize: '1.05rem' }}>Siguiente etapa: FASE 16 — Reportes</span>
+                    <span style={{ fontWeight: 700, fontSize: '1.05rem' }}>Siguiente etapa: FASE 17 — Auditoría</span>
                   </div>
                   <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-                    Ingresos del día, del período, conteo de vehículos. Filtros: Hoy, Ayer, Últimos 7 días, Mes.
+                    Registro automático de acciones críticas en audit_logs con visor de historial.
                   </p>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent-primary)', fontWeight: 600, fontSize: '0.9rem' }}>
