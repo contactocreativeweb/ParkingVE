@@ -4,6 +4,7 @@ import { LoginCard } from './components/auth/LoginCard';
 import { UserHeader } from './components/auth/UserHeader';
 import { TenantSetup } from './components/auth/TenantSetup';
 import { ParkingLotSettings } from './components/settings/ParkingLotSettings';
+import { TariffSettings } from './components/settings/TariffSettings';
 import { 
   ShieldCheck, 
   Building2, 
@@ -12,14 +13,15 @@ import {
   Sparkles, 
   ArrowRight,
   Settings,
+  DollarSign,
   LayoutDashboard
 } from 'lucide-react';
 
-type TabType = 'dashboard' | 'parking-settings';
+type TabType = 'dashboard' | 'parking-settings' | 'tariffs';
 
 const MainLayout: React.FC = () => {
   const { user, organization, role, currentParkingLot, loading } = useAuth();
-  const [activeTab, setActiveTab] = useState<TabType>('parking-settings');
+  const [activeTab, setActiveTab] = useState<TabType>('tariffs');
 
   if (loading) {
     return (
@@ -100,6 +102,27 @@ const MainLayout: React.FC = () => {
         }}>
           <button
             type="button"
+            onClick={() => setActiveTab('tariffs')}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              padding: '0.5rem 0.9rem',
+              borderRadius: 'var(--radius-md)',
+              fontSize: '0.875rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+              border: 'none',
+              backgroundColor: activeTab === 'tariffs' ? 'var(--bg-badge)' : 'transparent',
+              color: activeTab === 'tariffs' ? 'var(--accent-primary)' : 'var(--text-secondary)',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <DollarSign size={16} /> Tarifas (Fase 5)
+          </button>
+
+          <button
+            type="button"
             onClick={() => setActiveTab('parking-settings')}
             style={{
               display: 'inline-flex',
@@ -145,6 +168,10 @@ const MainLayout: React.FC = () => {
       <main style={{ flex: 1, padding: '2rem 1.25rem' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           
+          {activeTab === 'tariffs' && (
+            <TariffSettings />
+          )}
+
           {activeTab === 'parking-settings' && (
             <ParkingLotSettings />
           )}
@@ -166,13 +193,13 @@ const MainLayout: React.FC = () => {
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
                   <div>
                     <span className="badge badge-operator" style={{ marginBottom: '0.5rem' }}>
-                      <ShieldCheck size={14} /> FASE 3 & 4 OPERATIVAS
+                      <ShieldCheck size={14} /> FASES 3, 4 & 5 OPERATIVAS
                     </span>
                     <h1 style={{ fontSize: '1.85rem', margin: '0.25rem 0' }}>
                       Espacio de Trabajo Conectado
                     </h1>
                     <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
-                      Sesión validada con Supabase Auth. Aislamiento multi-tenant y reglas RLS en vigor.
+                      Sesión validada con Supabase Auth. Aislamiento multi-tenant y tarifas activas en BD.
                     </p>
                   </div>
 
@@ -276,10 +303,10 @@ const MainLayout: React.FC = () => {
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
                     <Sparkles size={18} color="var(--accent-primary)" />
-                    <span style={{ fontWeight: 700, fontSize: '1.05rem' }}>Siguiente etapa: FASE 5 — Tarifas</span>
+                    <span style={{ fontWeight: 700, fontSize: '1.05rem' }}>Siguiente etapa: FASE 6 — Servicios Adicionales</span>
                   </div>
                   <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-                    Configuración de precios de tarifa diaria y ticket perdido para CARRO y MOTO con actualización en tiempo real.
+                    Administración de servicios opcionales (Casco, Lavado, etc.) con precios en USD y activación/desactivación.
                   </p>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent-primary)', fontWeight: 600, fontSize: '0.9rem' }}>
