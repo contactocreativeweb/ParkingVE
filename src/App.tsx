@@ -11,6 +11,7 @@ import { EntryView } from './components/operations/EntryView';
 import { ActiveVehiclesView } from './components/operations/ActiveVehiclesView';
 import { ExitView } from './components/operations/ExitView';
 import { PaymentView } from './components/operations/PaymentView';
+import { ReceiptUploadView } from './components/operations/ReceiptUploadView';
 import { 
   ShieldCheck, 
   Building2, 
@@ -26,17 +27,29 @@ import {
   LogOut,
   Car,
   CreditCard,
+  UploadCloud,
   LayoutDashboard
 } from 'lucide-react';
 import type { ParkingSession } from './types/database';
 
-type TabType = 'dashboard' | 'parking-settings' | 'tariffs' | 'services' | 'customers' | 'entry' | 'active-vehicles' | 'exit' | 'payment';
+type TabType = 
+  | 'dashboard' 
+  | 'parking-settings' 
+  | 'tariffs' 
+  | 'services' 
+  | 'customers' 
+  | 'entry' 
+  | 'active-vehicles' 
+  | 'exit' 
+  | 'payment'
+  | 'receipts-upload';
 
 const MainLayout: React.FC = () => {
   const { user, organization, role, currentParkingLot, loading } = useAuth();
-  const [activeTab, setActiveTab] = useState<TabType>('payment');
+  const [activeTab, setActiveTab] = useState<TabType>('receipts-upload');
   const [selectedExitSessionId, setSelectedExitSessionId] = useState<string | null>(null);
   const [paymentSession, setPaymentSession] = useState<ParkingSession | null>(null);
+  const [uploadPaymentId, setUploadPaymentId] = useState<string | null>(null);
 
   if (loading) {
     return (
@@ -117,7 +130,7 @@ const MainLayout: React.FC = () => {
         }}>
           <button
             type="button"
-            onClick={() => setActiveTab('payment')}
+            onClick={() => setActiveTab('receipts-upload')}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -126,6 +139,27 @@ const MainLayout: React.FC = () => {
               borderRadius: 'var(--radius-md)',
               fontSize: '0.875rem',
               fontWeight: 700,
+              cursor: 'pointer',
+              border: 'none',
+              backgroundColor: activeTab === 'receipts-upload' ? 'var(--bg-badge)' : 'transparent',
+              color: activeTab === 'receipts-upload' ? 'var(--accent-primary)' : 'var(--text-secondary)',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <UploadCloud size={16} /> Comprobante (Fase 12)
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('payment')}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              padding: '0.5rem 0.9rem',
+              borderRadius: 'var(--radius-md)',
+              fontSize: '0.875rem',
+              fontWeight: 600,
               cursor: 'pointer',
               border: 'none',
               backgroundColor: activeTab === 'payment' ? 'var(--bg-badge)' : 'transparent',
@@ -309,11 +343,21 @@ const MainLayout: React.FC = () => {
       <main style={{ flex: 1, padding: '2rem 1.25rem' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           
+          {activeTab === 'receipts-upload' && (
+            <ReceiptUploadView
+              initialPaymentId={uploadPaymentId}
+              onReceiptUploaded={(rcId) => {
+                console.log('Comprobante subido:', rcId);
+              }}
+            />
+          )}
+
           {activeTab === 'payment' && (
             <PaymentView
               initialSession={paymentSession}
-              onPaymentRegistered={(payId, token) => {
-                console.log('Pago registrado:', payId, 'Token:', token);
+              onPaymentRegistered={(payId) => {
+                setUploadPaymentId(payId);
+                setActiveTab('receipts-upload');
               }}
             />
           )}
@@ -374,13 +418,13 @@ const MainLayout: React.FC = () => {
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
                   <div>
                     <span className="badge badge-operator" style={{ marginBottom: '0.5rem' }}>
-                      <ShieldCheck size={14} /> FASES 3 A 11 OPERATIVAS
+                      <ShieldCheck size={14} /> FASES 3 A 12 OPERATIVAS
                     </span>
                     <h1 style={{ fontSize: '1.85rem', margin: '0.25rem 0' }}>
                       Espacio de Trabajo Conectado
                     </h1>
                     <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
-                      Módulo de Pagos con soporte para Pago Móvil, POS, Efectivo y Enlaces Hash públicos activo.
+                      Módulo de Carga y Validación de Comprobantes cifrados activo en Supabase Storage.
                     </p>
                   </div>
 
@@ -484,10 +528,10 @@ const MainLayout: React.FC = () => {
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
                     <Sparkles size={18} color="var(--accent-primary)" />
-                    <span style={{ fontWeight: 700, fontSize: '1.05rem' }}>Siguiente etapa: FASE 12 — Comprobante</span>
+                    <span style={{ fontWeight: 700, fontSize: '1.05rem' }}>Siguiente etapa: FASE 13 — Revisión de Pagos</span>
                   </div>
                   <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-                    Subida y validación de comprobante de pago (JPG, JPEG, PNG, WEBP, PDF) por parte del cliente o del operador en bucket privado Supabase Storage.
+                    Dashboard de Pagos Pendientes con visualizador de comprobante, acciones de APROBAR o RECHAZAR (con motivo obligatorio si es rechazado) y actualización de estados.
                   </p>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent-primary)', fontWeight: 600, fontSize: '0.9rem' }}>
