@@ -7,6 +7,7 @@ import { ParkingLotSettings } from './components/settings/ParkingLotSettings';
 import { TariffSettings } from './components/settings/TariffSettings';
 import { AdditionalServicesSettings } from './components/settings/AdditionalServicesSettings';
 import { CustomersView } from './components/customers/CustomersView';
+import { EntryView } from './components/operations/EntryView';
 import { 
   ShieldCheck, 
   Building2, 
@@ -18,14 +19,15 @@ import {
   DollarSign,
   Layers,
   Users,
+  LogIn,
   LayoutDashboard
 } from 'lucide-react';
 
-type TabType = 'dashboard' | 'parking-settings' | 'tariffs' | 'services' | 'customers';
+type TabType = 'dashboard' | 'parking-settings' | 'tariffs' | 'services' | 'customers' | 'entry';
 
 const MainLayout: React.FC = () => {
   const { user, organization, role, currentParkingLot, loading } = useAuth();
-  const [activeTab, setActiveTab] = useState<TabType>('customers');
+  const [activeTab, setActiveTab] = useState<TabType>('entry');
 
   if (loading) {
     return (
@@ -104,6 +106,27 @@ const MainLayout: React.FC = () => {
           gap: '0.75rem',
           overflowX: 'auto',
         }}>
+          <button
+            type="button"
+            onClick={() => setActiveTab('entry')}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              padding: '0.5rem 0.9rem',
+              borderRadius: 'var(--radius-md)',
+              fontSize: '0.875rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              border: 'none',
+              backgroundColor: activeTab === 'entry' ? 'var(--bg-badge)' : 'transparent',
+              color: activeTab === 'entry' ? 'var(--accent-primary)' : 'var(--text-secondary)',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <LogIn size={16} /> Entrada (Fase 8)
+          </button>
+
           <button
             type="button"
             onClick={() => setActiveTab('customers')}
@@ -214,6 +237,10 @@ const MainLayout: React.FC = () => {
       <main style={{ flex: 1, padding: '2rem 1.25rem' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           
+          {activeTab === 'entry' && (
+            <EntryView />
+          )}
+
           {activeTab === 'customers' && (
             <CustomersView />
           )}
@@ -247,13 +274,13 @@ const MainLayout: React.FC = () => {
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
                   <div>
                     <span className="badge badge-operator" style={{ marginBottom: '0.5rem' }}>
-                      <ShieldCheck size={14} /> FASES 3 A 7 OPERATIVAS
+                      <ShieldCheck size={14} /> FASES 3 A 8 OPERATIVAS
                     </span>
                     <h1 style={{ fontSize: '1.85rem', margin: '0.25rem 0' }}>
                       Espacio de Trabajo Conectado
                     </h1>
                     <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
-                      Sesión validada con Supabase Auth. Base de clientes y vehículos locales por estacionamiento.
+                      Sesión validada con Supabase Auth. Módulo de Registro de Entrada rápido listo para operación.
                     </p>
                   </div>
 
@@ -357,10 +384,10 @@ const MainLayout: React.FC = () => {
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
                     <Sparkles size={18} color="var(--accent-primary)" />
-                    <span style={{ fontWeight: 700, fontSize: '1.05rem' }}>Siguiente etapa: FASE 8 — Registro de Entrada</span>
+                    <span style={{ fontWeight: 700, fontSize: '1.05rem' }}>Siguiente etapa: FASE 9 — Vehículos Activos</span>
                   </div>
                   <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-                    Pantalla ultra-rápida orientada a menos clics: Búsqueda/ingreso de Matrícula, selección Carro/Moto, asignación ágil de cliente y entrada inmediata.
+                    Dashboard y lista de vehículos actualmente dentro del estacionamiento (Matrícula, Cliente, Tipo, Hora de entrada, Tiempo transcurrido).
                   </p>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent-primary)', fontWeight: 600, fontSize: '0.9rem' }}>
