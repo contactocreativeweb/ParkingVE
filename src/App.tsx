@@ -8,6 +8,7 @@ import { TariffSettings } from './components/settings/TariffSettings';
 import { AdditionalServicesSettings } from './components/settings/AdditionalServicesSettings';
 import { CustomersView } from './components/customers/CustomersView';
 import { EntryView } from './components/operations/EntryView';
+import { ActiveVehiclesView } from './components/operations/ActiveVehiclesView';
 import { 
   ShieldCheck, 
   Building2, 
@@ -20,14 +21,15 @@ import {
   Layers,
   Users,
   LogIn,
+  Car,
   LayoutDashboard
 } from 'lucide-react';
 
-type TabType = 'dashboard' | 'parking-settings' | 'tariffs' | 'services' | 'customers' | 'entry';
+type TabType = 'dashboard' | 'parking-settings' | 'tariffs' | 'services' | 'customers' | 'entry' | 'active-vehicles';
 
 const MainLayout: React.FC = () => {
   const { user, organization, role, currentParkingLot, loading } = useAuth();
-  const [activeTab, setActiveTab] = useState<TabType>('entry');
+  const [activeTab, setActiveTab] = useState<TabType>('active-vehicles');
 
   if (loading) {
     return (
@@ -108,7 +110,7 @@ const MainLayout: React.FC = () => {
         }}>
           <button
             type="button"
-            onClick={() => setActiveTab('entry')}
+            onClick={() => setActiveTab('active-vehicles')}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -117,6 +119,27 @@ const MainLayout: React.FC = () => {
               borderRadius: 'var(--radius-md)',
               fontSize: '0.875rem',
               fontWeight: 700,
+              cursor: 'pointer',
+              border: 'none',
+              backgroundColor: activeTab === 'active-vehicles' ? 'var(--bg-badge)' : 'transparent',
+              color: activeTab === 'active-vehicles' ? 'var(--accent-primary)' : 'var(--text-secondary)',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <Car size={16} /> Vehículos Dentro (Fase 9)
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('entry')}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              padding: '0.5rem 0.9rem',
+              borderRadius: 'var(--radius-md)',
+              fontSize: '0.875rem',
+              fontWeight: 600,
               cursor: 'pointer',
               border: 'none',
               backgroundColor: activeTab === 'entry' ? 'var(--bg-badge)' : 'transparent',
@@ -237,6 +260,10 @@ const MainLayout: React.FC = () => {
       <main style={{ flex: 1, padding: '2rem 1.25rem' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           
+          {activeTab === 'active-vehicles' && (
+            <ActiveVehiclesView />
+          )}
+
           {activeTab === 'entry' && (
             <EntryView />
           )}
@@ -274,13 +301,13 @@ const MainLayout: React.FC = () => {
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
                   <div>
                     <span className="badge badge-operator" style={{ marginBottom: '0.5rem' }}>
-                      <ShieldCheck size={14} /> FASES 3 A 8 OPERATIVAS
+                      <ShieldCheck size={14} /> FASES 3 A 9 OPERATIVAS
                     </span>
                     <h1 style={{ fontSize: '1.85rem', margin: '0.25rem 0' }}>
                       Espacio de Trabajo Conectado
                     </h1>
                     <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
-                      Sesión validada con Supabase Auth. Módulo de Registro de Entrada rápido listo para operación.
+                      Sesión validada con Supabase Auth. Monitoreo en tiempo real de vehículos estacionados.
                     </p>
                   </div>
 
@@ -384,10 +411,10 @@ const MainLayout: React.FC = () => {
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
                     <Sparkles size={18} color="var(--accent-primary)" />
-                    <span style={{ fontWeight: 700, fontSize: '1.05rem' }}>Siguiente etapa: FASE 9 — Vehículos Activos</span>
+                    <span style={{ fontWeight: 700, fontSize: '1.05rem' }}>Siguiente etapa: FASE 10 — Registro de Salida</span>
                   </div>
                   <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-                    Dashboard y lista de vehículos actualmente dentro del estacionamiento (Matrícula, Cliente, Tipo, Hora de entrada, Tiempo transcurrido).
+                    Búsqueda de matrícula en salida, cálculo automático de tiempo y tarifa base, adición de servicios adicionales, aplicación de ticket perdido y cálculo de total verificado en backend.
                   </p>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent-primary)', fontWeight: 600, fontSize: '0.9rem' }}>
