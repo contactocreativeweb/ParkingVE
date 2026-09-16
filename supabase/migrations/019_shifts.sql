@@ -1,5 +1,5 @@
 -- 019_shifts.sql
-create table public.shifts (
+create table if not exists public.shifts (
   id uuid primary key default gen_random_uuid(),
   parking_lot_id uuid not null
     references public.parking_lots(id)

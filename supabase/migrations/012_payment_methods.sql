@@ -1,5 +1,5 @@
 -- 012_payment_methods.sql
-create table public.payment_methods (
+create table if not exists public.payment_methods (
   id uuid primary key default gen_random_uuid(),
   parking_lot_id uuid not null
     references public.parking_lots(id)

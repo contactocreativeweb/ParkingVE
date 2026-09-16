@@ -1,5 +1,5 @@
 -- 017_public_links.sql
-create table public.public_payment_links (
+create table if not exists public.public_payment_links (
   id uuid primary key default gen_random_uuid(),
   parking_lot_id uuid not null
     references public.parking_lots(id)

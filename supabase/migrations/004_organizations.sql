@@ -1,5 +1,5 @@
 -- 004_organizations.sql
-create table public.organizations (
+create table if not exists public.organizations (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   legal_name text,

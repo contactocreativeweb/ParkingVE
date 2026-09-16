@@ -1,58 +1,103 @@
+-- ==========================================
+-- File: 001_extensions.sql
+-- ==========================================
 -- 001_extensions.sql
 create extension if not exists "uuid-ossp";
 create extension if not exists "pgcrypto";
+
+
+-- ==========================================
+-- File: 002_enums.sql
+-- ==========================================
 -- 002_enums.sql
-create type public.organization_role as enum (
-  'OWNER',
-  'ADMIN',
-  'OPERATOR'
-);
+do $$ begin
+  create type public.organization_role as enum (
+    'OWNER',
+    'ADMIN',
+    'OPERATOR'
+  );
+exception
+  when duplicate_object then null;
+end $$;
 
-create type public.vehicle_type as enum (
-  'CAR',
-  'MOTORCYCLE'
-);
+do $$ begin
+  create type public.vehicle_type as enum (
+    'CAR',
+    'MOTORCYCLE'
+  );
+exception
+  when duplicate_object then null;
+end $$;
 
-create type public.payment_method_type as enum (
-  'CASH',
-  'POS',
-  'MOBILE_PAYMENT',
-  'BANK_TRANSFER'
-);
+do $$ begin
+  create type public.payment_method_type as enum (
+    'CASH',
+    'POS',
+    'MOBILE_PAYMENT',
+    'BANK_TRANSFER'
+  );
+exception
+  when duplicate_object then null;
+end $$;
 
-create type public.session_status as enum (
-  'ACTIVE',
-  'PAYMENT_PENDING',
-  'COMPLETED',
-  'CANCELLED'
-);
+do $$ begin
+  create type public.session_status as enum (
+    'ACTIVE',
+    'PAYMENT_PENDING',
+    'COMPLETED',
+    'CANCELLED'
+  );
+exception
+  when duplicate_object then null;
+end $$;
 
-create type public.payment_status as enum (
-  'PENDING',
-  'RECEIPT_REQUIRED',
-  'UNDER_REVIEW',
-  'APPROVED',
-  'REJECTED',
-  'CANCELLED'
-);
+do $$ begin
+  create type public.payment_status as enum (
+    'PENDING',
+    'RECEIPT_REQUIRED',
+    'UNDER_REVIEW',
+    'APPROVED',
+    'REJECTED',
+    'CANCELLED'
+  );
+exception
+  when duplicate_object then null;
+end $$;
 
-create type public.receipt_status as enum (
-  'RECEIVED',
-  'APPROVED',
-  'REJECTED'
-);
+do $$ begin
+  create type public.receipt_status as enum (
+    'RECEIVED',
+    'APPROVED',
+    'REJECTED'
+  );
+exception
+  when duplicate_object then null;
+end $$;
 
-create type public.public_link_type as enum (
-  'PAYMENT',
-  'RECEIPT'
-);
+do $$ begin
+  create type public.public_link_type as enum (
+    'PAYMENT',
+    'RECEIPT'
+  );
+exception
+  when duplicate_object then null;
+end $$;
 
-create type public.shift_status as enum (
-  'OPEN',
-  'CLOSED'
-);
+do $$ begin
+  create type public.shift_status as enum (
+    'OPEN',
+    'CLOSED'
+  );
+exception
+  when duplicate_object then null;
+end $$;
+
+
+-- ==========================================
+-- File: 003_profiles.sql
+-- ==========================================
 -- 003_profiles.sql
-create table public.profiles (
+create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   first_name text,
   last_name text,
@@ -61,8 +106,13 @@ create table public.profiles (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+
+-- ==========================================
+-- File: 004_organizations.sql
+-- ==========================================
 -- 004_organizations.sql
-create table public.organizations (
+create table if not exists public.organizations (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   legal_name text,
@@ -77,8 +127,13 @@ create table public.organizations (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+
+-- ==========================================
+-- File: 005_organization_members.sql
+-- ==========================================
 -- 005_organization_members.sql
-create table public.organization_members (
+create table if not exists public.organization_members (
   id uuid primary key default gen_random_uuid(),
   organization_id uuid not null
     references public.organizations(id)
@@ -91,8 +146,13 @@ create table public.organization_members (
   created_at timestamptz not null default now(),
   unique (organization_id, user_id)
 );
+
+
+-- ==========================================
+-- File: 006_parking_lots.sql
+-- ==========================================
 -- 006_parking_lots.sql
-create table public.parking_lots (
+create table if not exists public.parking_lots (
   id uuid primary key default gen_random_uuid(),
   organization_id uuid not null
     references public.organizations(id)
@@ -107,8 +167,13 @@ create table public.parking_lots (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+
+-- ==========================================
+-- File: 007_parking_lot_members.sql
+-- ==========================================
 -- 007_parking_lot_members.sql
-create table public.parking_lot_members (
+create table if not exists public.parking_lot_members (
   id uuid primary key default gen_random_uuid(),
   parking_lot_id uuid not null
     references public.parking_lots(id)
@@ -119,8 +184,13 @@ create table public.parking_lot_members (
   created_at timestamptz not null default now(),
   unique (parking_lot_id, user_id)
 );
+
+
+-- ==========================================
+-- File: 008_customers.sql
+-- ==========================================
 -- 008_customers.sql
-create table public.customers (
+create table if not exists public.customers (
   id uuid primary key default gen_random_uuid(),
   parking_lot_id uuid not null
     references public.parking_lots(id)
@@ -135,8 +205,13 @@ create table public.customers (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+
+-- ==========================================
+-- File: 009_vehicles.sql
+-- ==========================================
 -- 009_vehicles.sql
-create table public.vehicles (
+create table if not exists public.vehicles (
   id uuid primary key default gen_random_uuid(),
   parking_lot_id uuid not null
     references public.parking_lots(id)
@@ -154,8 +229,13 @@ create table public.vehicles (
   updated_at timestamptz not null default now(),
   unique (parking_lot_id, plate)
 );
+
+
+-- ==========================================
+-- File: 010_tariffs.sql
+-- ==========================================
 -- 010_tariffs.sql
-create table public.tariffs (
+create table if not exists public.tariffs (
   id uuid primary key default gen_random_uuid(),
   parking_lot_id uuid not null
     references public.parking_lots(id)
@@ -169,8 +249,13 @@ create table public.tariffs (
   updated_at timestamptz not null default now(),
   unique (parking_lot_id, vehicle_type)
 );
+
+
+-- ==========================================
+-- File: 011_additional_services.sql
+-- ==========================================
 -- 011_additional_services.sql
-create table public.additional_services (
+create table if not exists public.additional_services (
   id uuid primary key default gen_random_uuid(),
   parking_lot_id uuid not null
     references public.parking_lots(id)
@@ -182,8 +267,13 @@ create table public.additional_services (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+
+-- ==========================================
+-- File: 012_payment_methods.sql
+-- ==========================================
 -- 012_payment_methods.sql
-create table public.payment_methods (
+create table if not exists public.payment_methods (
   id uuid primary key default gen_random_uuid(),
   parking_lot_id uuid not null
     references public.parking_lots(id)
@@ -199,8 +289,13 @@ create table public.payment_methods (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+
+-- ==========================================
+-- File: 013_parking_sessions.sql
+-- ==========================================
 -- 013_parking_sessions.sql
-create table public.parking_sessions (
+create table if not exists public.parking_sessions (
   id uuid primary key default gen_random_uuid(),
   parking_lot_id uuid not null
     references public.parking_lots(id)
@@ -235,8 +330,13 @@ create table public.parking_sessions (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+
+-- ==========================================
+-- File: 014_session_services.sql
+-- ==========================================
 -- 014_session_services.sql
-create table public.session_additional_services (
+create table if not exists public.session_additional_services (
   id uuid primary key default gen_random_uuid(),
   session_id uuid not null
     references public.parking_sessions(id)
@@ -251,8 +351,13 @@ create table public.session_additional_services (
   currency_code text not null default 'USD',
   created_at timestamptz not null default now()
 );
+
+
+-- ==========================================
+-- File: 015_payments.sql
+-- ==========================================
 -- 015_payments.sql
-create table public.payments (
+create table if not exists public.payments (
   id uuid primary key default gen_random_uuid(),
   parking_lot_id uuid not null
     references public.parking_lots(id)
@@ -280,8 +385,13 @@ create table public.payments (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+
+-- ==========================================
+-- File: 016_payment_receipts.sql
+-- ==========================================
 -- 016_payment_receipts.sql
-create table public.payment_receipts (
+create table if not exists public.payment_receipts (
   id uuid primary key default gen_random_uuid(),
   payment_id uuid not null
     references public.payments(id)
@@ -298,8 +408,13 @@ create table public.payment_receipts (
     on delete set null,
   rejection_reason text
 );
+
+
+-- ==========================================
+-- File: 017_public_links.sql
+-- ==========================================
 -- 017_public_links.sql
-create table public.public_payment_links (
+create table if not exists public.public_payment_links (
   id uuid primary key default gen_random_uuid(),
   parking_lot_id uuid not null
     references public.parking_lots(id)
@@ -316,8 +431,13 @@ create table public.public_payment_links (
   is_active boolean not null default true,
   created_at timestamptz not null default now()
 );
+
+
+-- ==========================================
+-- File: 018_receipts.sql
+-- ==========================================
 -- 018_receipts.sql
-create table public.receipts (
+create table if not exists public.receipts (
   id uuid primary key default gen_random_uuid(),
   parking_lot_id uuid not null
     references public.parking_lots(id)
@@ -339,8 +459,13 @@ create table public.receipts (
   payment_method public.payment_method_type,
   created_at timestamptz not null default now()
 );
+
+
+-- ==========================================
+-- File: 019_shifts.sql
+-- ==========================================
 -- 019_shifts.sql
-create table public.shifts (
+create table if not exists public.shifts (
   id uuid primary key default gen_random_uuid(),
   parking_lot_id uuid not null
     references public.parking_lots(id)
@@ -358,8 +483,13 @@ create table public.shifts (
   notes text,
   created_at timestamptz not null default now()
 );
+
+
+-- ==========================================
+-- File: 020_audit_logs.sql
+-- ==========================================
 -- 020_audit_logs.sql
-create table public.audit_logs (
+create table if not exists public.audit_logs (
   id uuid primary key default gen_random_uuid(),
   organization_id uuid
     references public.organizations(id)
@@ -378,6 +508,11 @@ create table public.audit_logs (
   user_agent text,
   created_at timestamptz not null default now()
 );
+
+
+-- ==========================================
+-- File: 021_indexes.sql
+-- ==========================================
 -- 021_indexes.sql
 create index if not exists idx_org_members_user
   on public.organization_members(user_id);
@@ -431,6 +566,11 @@ create index if not exists idx_audit_logs_parking_date
 create unique index if not exists idx_one_active_session_per_vehicle
   on public.parking_sessions(parking_lot_id, vehicle_id)
   where status in ('ACTIVE', 'PAYMENT_PENDING');
+
+
+-- ==========================================
+-- File: 022_functions.sql
+-- ==========================================
 -- 022_functions.sql
 
 -- 1. Función para normalizar placas vehiculares (mayúsculas, sin espacios ni caracteres especiales)
@@ -596,6 +736,11 @@ begin
   return v_grand_total;
 end;
 $$;
+
+
+-- ==========================================
+-- File: 023_rls.sql
+-- ==========================================
 -- 023_rls.sql
 
 -- Activar RLS en todas las tablas públicas
@@ -670,52 +815,52 @@ as $$
 $$;
 
 -- 1. Políticas para PROFILES
-create policy "Los usuarios pueden ver su propio perfil"
-  on public.profiles for select
+drop policy if exists "Los usuarios pueden ver su propio perfil" on public.profiles;
+create policy "Los usuarios pueden ver su propio perfil" on public.profiles for select
   using (id = auth.uid() or exists (
     select 1 from public.organization_members om1
     join public.organization_members om2 on om1.organization_id = om2.organization_id
     where om1.user_id = auth.uid() and om2.user_id = public.profiles.id
   ));
 
-create policy "Los usuarios pueden actualizar su propio perfil"
-  on public.profiles for update
+drop policy if exists "Los usuarios pueden actualizar su propio perfil" on public.profiles;
+create policy "Los usuarios pueden actualizar su propio perfil" on public.profiles for update
   using (id = auth.uid());
 
 -- 2. Políticas para ORGANIZATIONS
-create policy "Miembros activos pueden ver su organizacion"
-  on public.organizations for select
+drop policy if exists "Miembros activos pueden ver su organizacion" on public.organizations;
+create policy "Miembros activos pueden ver su organizacion" on public.organizations for select
   using (public.user_has_org_membership(id));
 
-create policy "Solo OWNER o ADMIN pueden actualizar su organizacion"
-  on public.organizations for update
+drop policy if exists "Solo OWNER o ADMIN pueden actualizar su organizacion" on public.organizations;
+create policy "Solo OWNER o ADMIN pueden actualizar su organizacion" on public.organizations for update
   using (public.user_org_role(id) in ('OWNER', 'ADMIN'));
 
 -- 3. Políticas para ORGANIZATION_MEMBERS
-create policy "Miembros de la org pueden ver otros miembros"
-  on public.organization_members for select
+drop policy if exists "Miembros de la org pueden ver otros miembros" on public.organization_members;
+create policy "Miembros de la org pueden ver otros miembros" on public.organization_members for select
   using (public.user_has_org_membership(organization_id));
 
-create policy "OWNER y ADMIN pueden gestionar miembros"
-  on public.organization_members for all
+drop policy if exists "OWNER y ADMIN pueden gestionar miembros" on public.organization_members;
+create policy "OWNER y ADMIN pueden gestionar miembros" on public.organization_members for all
   using (public.user_org_role(organization_id) in ('OWNER', 'ADMIN'));
 
 -- 4. Políticas para PARKING_LOTS
-create policy "Ver estacionamientos autorizados"
-  on public.parking_lots for select
+drop policy if exists "Ver estacionamientos autorizados" on public.parking_lots;
+create policy "Ver estacionamientos autorizados" on public.parking_lots for select
   using (public.user_has_parking_lot_access(id));
 
-create policy "OWNER y ADMIN pueden modificar estacionamientos"
-  on public.parking_lots for all
+drop policy if exists "OWNER y ADMIN pueden modificar estacionamientos" on public.parking_lots;
+create policy "OWNER y ADMIN pueden modificar estacionamientos" on public.parking_lots for all
   using (public.user_org_role(organization_id) in ('OWNER', 'ADMIN'));
 
 -- 5. Políticas para PARKING_LOT_MEMBERS
-create policy "Ver asignaciones de operadores"
-  on public.parking_lot_members for select
+drop policy if exists "Ver asignaciones de operadores" on public.parking_lot_members;
+create policy "Ver asignaciones de operadores" on public.parking_lot_members for select
   using (public.user_has_parking_lot_access(parking_lot_id));
 
-create policy "OWNER y ADMIN pueden asignar operadores a estacionamiento"
-  on public.parking_lot_members for all
+drop policy if exists "OWNER y ADMIN pueden asignar operadores a estacionamiento" on public.parking_lot_members;
+create policy "OWNER y ADMIN pueden asignar operadores a estacionamiento" on public.parking_lot_members for all
   using (
     exists (
       select 1 from public.parking_lots pl
@@ -725,24 +870,24 @@ create policy "OWNER y ADMIN pueden asignar operadores a estacionamiento"
   );
 
 -- 6. Políticas para CUSTOMERS
-create policy "Operadores y administradores pueden ver y gestionar clientes"
-  on public.customers for all
+drop policy if exists "Operadores y administradores pueden ver y gestionar clientes" on public.customers;
+create policy "Operadores y administradores pueden ver y gestionar clientes" on public.customers for all
   using (public.user_has_parking_lot_access(parking_lot_id))
   with check (public.user_has_parking_lot_access(parking_lot_id));
 
 -- 7. Políticas para VEHICLES
-create policy "Operadores y administradores pueden ver y gestionar vehiculos"
-  on public.vehicles for all
+drop policy if exists "Operadores y administradores pueden ver y gestionar vehiculos" on public.vehicles;
+create policy "Operadores y administradores pueden ver y gestionar vehiculos" on public.vehicles for all
   using (public.user_has_parking_lot_access(parking_lot_id))
   with check (public.user_has_parking_lot_access(parking_lot_id));
 
 -- 8. Políticas para TARIFFS
-create policy "Ver tarifas del estacionamiento"
-  on public.tariffs for select
+drop policy if exists "Ver tarifas del estacionamiento" on public.tariffs;
+create policy "Ver tarifas del estacionamiento" on public.tariffs for select
   using (public.user_has_parking_lot_access(parking_lot_id));
 
-create policy "Solo OWNER y ADMIN pueden modificar tarifas"
-  on public.tariffs for all
+drop policy if exists "Solo OWNER y ADMIN pueden modificar tarifas" on public.tariffs;
+create policy "Solo OWNER y ADMIN pueden modificar tarifas" on public.tariffs for all
   using (
     exists (
       select 1 from public.parking_lots pl
@@ -752,12 +897,12 @@ create policy "Solo OWNER y ADMIN pueden modificar tarifas"
   );
 
 -- 9. Políticas para ADDITIONAL_SERVICES
-create policy "Ver servicios adicionales"
-  on public.additional_services for select
+drop policy if exists "Ver servicios adicionales" on public.additional_services;
+create policy "Ver servicios adicionales" on public.additional_services for select
   using (public.user_has_parking_lot_access(parking_lot_id));
 
-create policy "Solo OWNER y ADMIN pueden modificar servicios adicionales"
-  on public.additional_services for all
+drop policy if exists "Solo OWNER y ADMIN pueden modificar servicios adicionales" on public.additional_services;
+create policy "Solo OWNER y ADMIN pueden modificar servicios adicionales" on public.additional_services for all
   using (
     exists (
       select 1 from public.parking_lots pl
@@ -767,12 +912,12 @@ create policy "Solo OWNER y ADMIN pueden modificar servicios adicionales"
   );
 
 -- 10. Políticas para PAYMENT_METHODS
-create policy "Ver metodos de pago"
-  on public.payment_methods for select
+drop policy if exists "Ver metodos de pago" on public.payment_methods;
+create policy "Ver metodos de pago" on public.payment_methods for select
   using (public.user_has_parking_lot_access(parking_lot_id));
 
-create policy "Solo OWNER y ADMIN pueden modificar metodos de pago"
-  on public.payment_methods for all
+drop policy if exists "Solo OWNER y ADMIN pueden modificar metodos de pago" on public.payment_methods;
+create policy "Solo OWNER y ADMIN pueden modificar metodos de pago" on public.payment_methods for all
   using (
     exists (
       select 1 from public.parking_lots pl
@@ -782,14 +927,14 @@ create policy "Solo OWNER y ADMIN pueden modificar metodos de pago"
   );
 
 -- 11. Políticas para PARKING_SESSIONS
-create policy "Gestionar sesiones del estacionamiento autorizado"
-  on public.parking_sessions for all
+drop policy if exists "Gestionar sesiones del estacionamiento autorizado" on public.parking_sessions;
+create policy "Gestionar sesiones del estacionamiento autorizado" on public.parking_sessions for all
   using (public.user_has_parking_lot_access(parking_lot_id))
   with check (public.user_has_parking_lot_access(parking_lot_id));
 
 -- 12. Políticas para SESSION_ADDITIONAL_SERVICES
-create policy "Gestionar servicios de la sesion"
-  on public.session_additional_services for all
+drop policy if exists "Gestionar servicios de la sesion" on public.session_additional_services;
+create policy "Gestionar servicios de la sesion" on public.session_additional_services for all
   using (
     exists (
       select 1 from public.parking_sessions ps
@@ -799,14 +944,14 @@ create policy "Gestionar servicios de la sesion"
   );
 
 -- 13. Políticas para PAYMENTS
-create policy "Operadores y administradores pueden gestionar pagos"
-  on public.payments for all
+drop policy if exists "Operadores y administradores pueden gestionar pagos" on public.payments;
+create policy "Operadores y administradores pueden gestionar pagos" on public.payments for all
   using (public.user_has_parking_lot_access(parking_lot_id))
   with check (public.user_has_parking_lot_access(parking_lot_id));
 
 -- 14. Políticas para PAYMENT_RECEIPTS (comprobantes de pago)
-create policy "Ver y revisar comprobantes de pago de su estacionamiento"
-  on public.payment_receipts for all
+drop policy if exists "Ver y revisar comprobantes de pago de su estacionamiento" on public.payment_receipts;
+create policy "Ver y revisar comprobantes de pago de su estacionamiento" on public.payment_receipts for all
   using (
     exists (
       select 1 from public.payments p
@@ -816,38 +961,38 @@ create policy "Ver y revisar comprobantes de pago de su estacionamiento"
   );
 
 -- 15. Políticas para PUBLIC_PAYMENT_LINKS (acceso público seguro y del operador)
-create policy "Operadores gestionan links de pago"
-  on public.public_payment_links for all
+drop policy if exists "Operadores gestionan links de pago" on public.public_payment_links;
+create policy "Operadores gestionan links de pago" on public.public_payment_links for all
   using (public.user_has_parking_lot_access(parking_lot_id))
   with check (public.user_has_parking_lot_access(parking_lot_id));
 
-create policy "Acceso publico por token anonimo activo y vigente"
-  on public.public_payment_links for select
+drop policy if exists "Acceso publico por token anonimo activo y vigente" on public.public_payment_links;
+create policy "Acceso publico por token anonimo activo y vigente" on public.public_payment_links for select
   using (
     is_active = true
     and (expires_at is null or expires_at > now())
   );
 
 -- 16. Políticas para RECEIPTS
-create policy "Ver recibos del estacionamiento autorizado"
-  on public.receipts for all
+drop policy if exists "Ver recibos del estacionamiento autorizado" on public.receipts;
+create policy "Ver recibos del estacionamiento autorizado" on public.receipts for all
   using (public.user_has_parking_lot_access(parking_lot_id));
 
 -- 17. Políticas para SHIFTS (caja y turnos)
-create policy "Gestionar turnos de caja"
-  on public.shifts for all
+drop policy if exists "Gestionar turnos de caja" on public.shifts;
+create policy "Gestionar turnos de caja" on public.shifts for all
   using (public.user_has_parking_lot_access(parking_lot_id))
   with check (public.user_has_parking_lot_access(parking_lot_id));
 
 -- 18. Políticas para AUDIT_LOGS
-create policy "Solo OWNER y ADMIN pueden ver logs de auditoria"
-  on public.audit_logs for select
+drop policy if exists "Solo OWNER y ADMIN pueden ver logs de auditoria" on public.audit_logs;
+create policy "Solo OWNER y ADMIN pueden ver logs de auditoria" on public.audit_logs for select
   using (
     public.user_org_role(organization_id) in ('OWNER', 'ADMIN')
   );
 
-create policy "Insertar logs de auditoria"
-  on public.audit_logs for insert
+drop policy if exists "Insertar logs de auditoria" on public.audit_logs;
+create policy "Insertar logs de auditoria" on public.audit_logs for insert
   with check (
     organization_id is not null
   );

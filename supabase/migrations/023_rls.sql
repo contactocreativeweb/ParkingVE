@@ -72,52 +72,52 @@ as $$
 $$;
 
 -- 1. Políticas para PROFILES
-create policy "Los usuarios pueden ver su propio perfil"
-  on public.profiles for select
+drop policy if exists "Los usuarios pueden ver su propio perfil" on public.profiles;
+create policy "Los usuarios pueden ver su propio perfil" on public.profiles for select
   using (id = auth.uid() or exists (
     select 1 from public.organization_members om1
     join public.organization_members om2 on om1.organization_id = om2.organization_id
     where om1.user_id = auth.uid() and om2.user_id = public.profiles.id
   ));
 
-create policy "Los usuarios pueden actualizar su propio perfil"
-  on public.profiles for update
+drop policy if exists "Los usuarios pueden actualizar su propio perfil" on public.profiles;
+create policy "Los usuarios pueden actualizar su propio perfil" on public.profiles for update
   using (id = auth.uid());
 
 -- 2. Políticas para ORGANIZATIONS
-create policy "Miembros activos pueden ver su organizacion"
-  on public.organizations for select
+drop policy if exists "Miembros activos pueden ver su organizacion" on public.organizations;
+create policy "Miembros activos pueden ver su organizacion" on public.organizations for select
   using (public.user_has_org_membership(id));
 
-create policy "Solo OWNER o ADMIN pueden actualizar su organizacion"
-  on public.organizations for update
+drop policy if exists "Solo OWNER o ADMIN pueden actualizar su organizacion" on public.organizations;
+create policy "Solo OWNER o ADMIN pueden actualizar su organizacion" on public.organizations for update
   using (public.user_org_role(id) in ('OWNER', 'ADMIN'));
 
 -- 3. Políticas para ORGANIZATION_MEMBERS
-create policy "Miembros de la org pueden ver otros miembros"
-  on public.organization_members for select
+drop policy if exists "Miembros de la org pueden ver otros miembros" on public.organization_members;
+create policy "Miembros de la org pueden ver otros miembros" on public.organization_members for select
   using (public.user_has_org_membership(organization_id));
 
-create policy "OWNER y ADMIN pueden gestionar miembros"
-  on public.organization_members for all
+drop policy if exists "OWNER y ADMIN pueden gestionar miembros" on public.organization_members;
+create policy "OWNER y ADMIN pueden gestionar miembros" on public.organization_members for all
   using (public.user_org_role(organization_id) in ('OWNER', 'ADMIN'));
 
 -- 4. Políticas para PARKING_LOTS
-create policy "Ver estacionamientos autorizados"
-  on public.parking_lots for select
+drop policy if exists "Ver estacionamientos autorizados" on public.parking_lots;
+create policy "Ver estacionamientos autorizados" on public.parking_lots for select
   using (public.user_has_parking_lot_access(id));
 
-create policy "OWNER y ADMIN pueden modificar estacionamientos"
-  on public.parking_lots for all
+drop policy if exists "OWNER y ADMIN pueden modificar estacionamientos" on public.parking_lots;
+create policy "OWNER y ADMIN pueden modificar estacionamientos" on public.parking_lots for all
   using (public.user_org_role(organization_id) in ('OWNER', 'ADMIN'));
 
 -- 5. Políticas para PARKING_LOT_MEMBERS
-create policy "Ver asignaciones de operadores"
-  on public.parking_lot_members for select
+drop policy if exists "Ver asignaciones de operadores" on public.parking_lot_members;
+create policy "Ver asignaciones de operadores" on public.parking_lot_members for select
   using (public.user_has_parking_lot_access(parking_lot_id));
 
-create policy "OWNER y ADMIN pueden asignar operadores a estacionamiento"
-  on public.parking_lot_members for all
+drop policy if exists "OWNER y ADMIN pueden asignar operadores a estacionamiento" on public.parking_lot_members;
+create policy "OWNER y ADMIN pueden asignar operadores a estacionamiento" on public.parking_lot_members for all
   using (
     exists (
       select 1 from public.parking_lots pl
@@ -127,24 +127,24 @@ create policy "OWNER y ADMIN pueden asignar operadores a estacionamiento"
   );
 
 -- 6. Políticas para CUSTOMERS
-create policy "Operadores y administradores pueden ver y gestionar clientes"
-  on public.customers for all
+drop policy if exists "Operadores y administradores pueden ver y gestionar clientes" on public.customers;
+create policy "Operadores y administradores pueden ver y gestionar clientes" on public.customers for all
   using (public.user_has_parking_lot_access(parking_lot_id))
   with check (public.user_has_parking_lot_access(parking_lot_id));
 
 -- 7. Políticas para VEHICLES
-create policy "Operadores y administradores pueden ver y gestionar vehiculos"
-  on public.vehicles for all
+drop policy if exists "Operadores y administradores pueden ver y gestionar vehiculos" on public.vehicles;
+create policy "Operadores y administradores pueden ver y gestionar vehiculos" on public.vehicles for all
   using (public.user_has_parking_lot_access(parking_lot_id))
   with check (public.user_has_parking_lot_access(parking_lot_id));
 
 -- 8. Políticas para TARIFFS
-create policy "Ver tarifas del estacionamiento"
-  on public.tariffs for select
+drop policy if exists "Ver tarifas del estacionamiento" on public.tariffs;
+create policy "Ver tarifas del estacionamiento" on public.tariffs for select
   using (public.user_has_parking_lot_access(parking_lot_id));
 
-create policy "Solo OWNER y ADMIN pueden modificar tarifas"
-  on public.tariffs for all
+drop policy if exists "Solo OWNER y ADMIN pueden modificar tarifas" on public.tariffs;
+create policy "Solo OWNER y ADMIN pueden modificar tarifas" on public.tariffs for all
   using (
     exists (
       select 1 from public.parking_lots pl
@@ -154,12 +154,12 @@ create policy "Solo OWNER y ADMIN pueden modificar tarifas"
   );
 
 -- 9. Políticas para ADDITIONAL_SERVICES
-create policy "Ver servicios adicionales"
-  on public.additional_services for select
+drop policy if exists "Ver servicios adicionales" on public.additional_services;
+create policy "Ver servicios adicionales" on public.additional_services for select
   using (public.user_has_parking_lot_access(parking_lot_id));
 
-create policy "Solo OWNER y ADMIN pueden modificar servicios adicionales"
-  on public.additional_services for all
+drop policy if exists "Solo OWNER y ADMIN pueden modificar servicios adicionales" on public.additional_services;
+create policy "Solo OWNER y ADMIN pueden modificar servicios adicionales" on public.additional_services for all
   using (
     exists (
       select 1 from public.parking_lots pl
@@ -169,12 +169,12 @@ create policy "Solo OWNER y ADMIN pueden modificar servicios adicionales"
   );
 
 -- 10. Políticas para PAYMENT_METHODS
-create policy "Ver metodos de pago"
-  on public.payment_methods for select
+drop policy if exists "Ver metodos de pago" on public.payment_methods;
+create policy "Ver metodos de pago" on public.payment_methods for select
   using (public.user_has_parking_lot_access(parking_lot_id));
 
-create policy "Solo OWNER y ADMIN pueden modificar metodos de pago"
-  on public.payment_methods for all
+drop policy if exists "Solo OWNER y ADMIN pueden modificar metodos de pago" on public.payment_methods;
+create policy "Solo OWNER y ADMIN pueden modificar metodos de pago" on public.payment_methods for all
   using (
     exists (
       select 1 from public.parking_lots pl
@@ -184,14 +184,14 @@ create policy "Solo OWNER y ADMIN pueden modificar metodos de pago"
   );
 
 -- 11. Políticas para PARKING_SESSIONS
-create policy "Gestionar sesiones del estacionamiento autorizado"
-  on public.parking_sessions for all
+drop policy if exists "Gestionar sesiones del estacionamiento autorizado" on public.parking_sessions;
+create policy "Gestionar sesiones del estacionamiento autorizado" on public.parking_sessions for all
   using (public.user_has_parking_lot_access(parking_lot_id))
   with check (public.user_has_parking_lot_access(parking_lot_id));
 
 -- 12. Políticas para SESSION_ADDITIONAL_SERVICES
-create policy "Gestionar servicios de la sesion"
-  on public.session_additional_services for all
+drop policy if exists "Gestionar servicios de la sesion" on public.session_additional_services;
+create policy "Gestionar servicios de la sesion" on public.session_additional_services for all
   using (
     exists (
       select 1 from public.parking_sessions ps
@@ -201,14 +201,14 @@ create policy "Gestionar servicios de la sesion"
   );
 
 -- 13. Políticas para PAYMENTS
-create policy "Operadores y administradores pueden gestionar pagos"
-  on public.payments for all
+drop policy if exists "Operadores y administradores pueden gestionar pagos" on public.payments;
+create policy "Operadores y administradores pueden gestionar pagos" on public.payments for all
   using (public.user_has_parking_lot_access(parking_lot_id))
   with check (public.user_has_parking_lot_access(parking_lot_id));
 
 -- 14. Políticas para PAYMENT_RECEIPTS (comprobantes de pago)
-create policy "Ver y revisar comprobantes de pago de su estacionamiento"
-  on public.payment_receipts for all
+drop policy if exists "Ver y revisar comprobantes de pago de su estacionamiento" on public.payment_receipts;
+create policy "Ver y revisar comprobantes de pago de su estacionamiento" on public.payment_receipts for all
   using (
     exists (
       select 1 from public.payments p
@@ -218,38 +218,38 @@ create policy "Ver y revisar comprobantes de pago de su estacionamiento"
   );
 
 -- 15. Políticas para PUBLIC_PAYMENT_LINKS (acceso público seguro y del operador)
-create policy "Operadores gestionan links de pago"
-  on public.public_payment_links for all
+drop policy if exists "Operadores gestionan links de pago" on public.public_payment_links;
+create policy "Operadores gestionan links de pago" on public.public_payment_links for all
   using (public.user_has_parking_lot_access(parking_lot_id))
   with check (public.user_has_parking_lot_access(parking_lot_id));
 
-create policy "Acceso publico por token anonimo activo y vigente"
-  on public.public_payment_links for select
+drop policy if exists "Acceso publico por token anonimo activo y vigente" on public.public_payment_links;
+create policy "Acceso publico por token anonimo activo y vigente" on public.public_payment_links for select
   using (
     is_active = true
     and (expires_at is null or expires_at > now())
   );
 
 -- 16. Políticas para RECEIPTS
-create policy "Ver recibos del estacionamiento autorizado"
-  on public.receipts for all
+drop policy if exists "Ver recibos del estacionamiento autorizado" on public.receipts;
+create policy "Ver recibos del estacionamiento autorizado" on public.receipts for all
   using (public.user_has_parking_lot_access(parking_lot_id));
 
 -- 17. Políticas para SHIFTS (caja y turnos)
-create policy "Gestionar turnos de caja"
-  on public.shifts for all
+drop policy if exists "Gestionar turnos de caja" on public.shifts;
+create policy "Gestionar turnos de caja" on public.shifts for all
   using (public.user_has_parking_lot_access(parking_lot_id))
   with check (public.user_has_parking_lot_access(parking_lot_id));
 
 -- 18. Políticas para AUDIT_LOGS
-create policy "Solo OWNER y ADMIN pueden ver logs de auditoria"
-  on public.audit_logs for select
+drop policy if exists "Solo OWNER y ADMIN pueden ver logs de auditoria" on public.audit_logs;
+create policy "Solo OWNER y ADMIN pueden ver logs de auditoria" on public.audit_logs for select
   using (
     public.user_org_role(organization_id) in ('OWNER', 'ADMIN')
   );
 
-create policy "Insertar logs de auditoria"
-  on public.audit_logs for insert
+drop policy if exists "Insertar logs de auditoria" on public.audit_logs;
+create policy "Insertar logs de auditoria" on public.audit_logs for insert
   with check (
     organization_id is not null
   );

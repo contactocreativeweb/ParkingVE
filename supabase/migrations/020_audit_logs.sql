@@ -1,5 +1,5 @@
 -- 020_audit_logs.sql
-create table public.audit_logs (
+create table if not exists public.audit_logs (
   id uuid primary key default gen_random_uuid(),
   organization_id uuid
     references public.organizations(id)

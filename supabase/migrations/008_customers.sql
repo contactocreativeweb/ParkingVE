@@ -1,5 +1,5 @@
 -- 008_customers.sql
-create table public.customers (
+create table if not exists public.customers (
   id uuid primary key default gen_random_uuid(),
   parking_lot_id uuid not null
     references public.parking_lots(id)

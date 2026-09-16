@@ -1,5 +1,5 @@
 -- 013_parking_sessions.sql
-create table public.parking_sessions (
+create table if not exists public.parking_sessions (
   id uuid primary key default gen_random_uuid(),
   parking_lot_id uuid not null
     references public.parking_lots(id)

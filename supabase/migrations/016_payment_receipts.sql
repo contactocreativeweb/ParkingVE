@@ -1,5 +1,5 @@
 -- 016_payment_receipts.sql
-create table public.payment_receipts (
+create table if not exists public.payment_receipts (
   id uuid primary key default gen_random_uuid(),
   payment_id uuid not null
     references public.payments(id)

@@ -1,5 +1,5 @@
 -- 011_additional_services.sql
-create table public.additional_services (
+create table if not exists public.additional_services (
   id uuid primary key default gen_random_uuid(),
   parking_lot_id uuid not null
     references public.parking_lots(id)

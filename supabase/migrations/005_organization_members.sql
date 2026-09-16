@@ -1,5 +1,5 @@
 -- 005_organization_members.sql
-create table public.organization_members (
+create table if not exists public.organization_members (
   id uuid primary key default gen_random_uuid(),
   organization_id uuid not null
     references public.organizations(id)

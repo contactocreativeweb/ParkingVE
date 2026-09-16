@@ -1,5 +1,5 @@
 -- 014_session_services.sql
-create table public.session_additional_services (
+create table if not exists public.session_additional_services (
   id uuid primary key default gen_random_uuid(),
   session_id uuid not null
     references public.parking_sessions(id)
