@@ -460,8 +460,9 @@ export const EntryView: React.FC = () => {
                 fontWeight: 700,
                 cursor: 'pointer',
                 border: vehicleType === 'CAR' ? '2px solid var(--accent-primary)' : '1px solid var(--border-subtle)',
-                backgroundColor: vehicleType === 'CAR' ? 'var(--bg-badge)' : 'var(--bg-input)',
-                color: vehicleType === 'CAR' ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                backgroundColor: vehicleType === 'CAR' ? 'var(--accent-primary)' : 'var(--bg-card)',
+                color: vehicleType === 'CAR' ? '#ffffff' : 'var(--text-secondary)',
+                boxShadow: vehicleType === 'CAR' ? '0 4px 14px rgba(43, 130, 181, 0.3)' : 'var(--shadow-sm)',
                 transition: 'all 0.15s ease',
               }}
             >
@@ -481,9 +482,10 @@ export const EntryView: React.FC = () => {
                 fontSize: '1.05rem',
                 fontWeight: 700,
                 cursor: 'pointer',
-                border: vehicleType === 'MOTORCYCLE' ? '2px solid var(--accent-secondary)' : '1px solid var(--border-subtle)',
-                backgroundColor: vehicleType === 'MOTORCYCLE' ? 'rgba(6, 182, 212, 0.12)' : 'var(--bg-input)',
-                color: vehicleType === 'MOTORCYCLE' ? 'var(--accent-secondary)' : 'var(--text-secondary)',
+                border: vehicleType === 'MOTORCYCLE' ? '2px solid var(--accent-primary)' : '1px solid var(--border-subtle)',
+                backgroundColor: vehicleType === 'MOTORCYCLE' ? 'var(--accent-primary)' : 'var(--bg-card)',
+                color: vehicleType === 'MOTORCYCLE' ? '#ffffff' : 'var(--text-secondary)',
+                boxShadow: vehicleType === 'MOTORCYCLE' ? '0 4px 14px rgba(43, 130, 181, 0.3)' : 'var(--shadow-sm)',
                 transition: 'all 0.15s ease',
               }}
             >

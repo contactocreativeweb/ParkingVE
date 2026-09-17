@@ -1,41 +1,42 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 :root {
-  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sans: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
-  /* Color Palette (Dark Theme Modern Slate / Indigo Accent) */
-  --bg-main: #090d16;
-  --bg-card: #111726;
-  --bg-card-hover: #161e32;
-  --bg-input: #1a233a;
-  --bg-badge: rgba(99, 102, 241, 0.12);
+  /* Color Palette — "Parking Space Finder" Modern Clean Cerulean Theme */
+  --bg-main: #edf2f7;         /* Soft, luminous slate-blue canvas */
+  --bg-card: #ffffff;         /* Clean pure white card surface */
+  --bg-card-hover: #f8fafc;
+  --bg-input: #f8fafc;        /* Soft off-white for form inputs */
+  --bg-badge: #eaf3f9;        /* Soft ice-blue tint for badges & active states */
 
-  --border-subtle: #1e293b;
-  --border-focus: #6366f1;
+  --border-subtle: #e2e8f0;    /* Crisp, clean borders */
+  --border-focus: #2b82b5;     /* Signature Cerulean blue */
   --border-error: #ef4444;
 
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --text-primary: #1e293b;     /* Slate 900 for optimal contrast & legibility */
+  --text-secondary: #5b6e82;   /* Slate 600 for supporting labels */
+  --text-muted: #8fa0b2;       /* Slate 400 for secondary timestamps & badges */
 
-  --accent-primary: #6366f1;
-  --accent-primary-hover: #4f46e5;
-  --accent-secondary: #06b6d4;
+  --accent-primary: #2b82b5;   /* Signature Cerulean Blue from UI Kit */
+  --accent-primary-hover: #22709d;
+  --accent-secondary: #52a5d2; /* Lighter sky blue */
+  --accent-light: #eaf3f9;     /* Soft ice blue fill */
 
   --status-success: #10b981;
   --status-warning: #f59e0b;
   --status-error: #ef4444;
-  --status-info: #3b82f6;
+  --status-info: #2b82b5;
 
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
-  --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.25);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 16px -2px rgba(43, 130, 181, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
+  --shadow-lg: 0 12px 28px -4px rgba(43, 130, 181, 0.12), 0 4px 12px -2px rgba(0, 0, 0, 0.04);
+  --shadow-glow: 0 0 20px rgba(43, 130, 181, 0.22);
 
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
   --radius-full: 9999px;
 
   --transition-fast: 0.15s ease;
@@ -104,13 +105,14 @@ h1, h2, h3, h4 {
   color: var(--text-primary);
   font-size: 1rem;
   font-family: inherit;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast);
 }
 
 .input-field:focus {
   outline: none;
   border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+  box-shadow: 0 0 0 3px rgba(43, 130, 181, 0.2);
+  background-color: #ffffff;
 }
 
 .input-field::placeholder {
@@ -134,14 +136,14 @@ h1, h2, h3, h4 {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  background: #2b82b5;
   color: #ffffff;
-  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
+  box-shadow: 0 4px 14px rgba(43, 130, 181, 0.3);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
-  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.5);
+  background: #22709d;
+  box-shadow: 0 6px 20px rgba(43, 130, 181, 0.42);
   transform: translateY(-1px);
 }
 
@@ -150,13 +152,15 @@ h1, h2, h3, h4 {
 }
 
 .btn-secondary {
-  background: #1e293b;
+  background: #ffffff;
   color: var(--text-primary);
-  border-color: var(--border-subtle);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: #334155;
+  background: #f1f5f9;
+  border-color: #cbd5e1;
 }
 
 .btn-ghost {
@@ -165,8 +169,8 @@ h1, h2, h3, h4 {
 }
 
 .btn-ghost:hover {
-  color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.05);
+  color: var(--accent-primary);
+  background: rgba(43, 130, 181, 0.08);
 }
 
 .btn:disabled {
@@ -188,21 +192,21 @@ h1, h2, h3, h4 {
 }
 
 .badge-owner {
-  background: rgba(245, 158, 11, 0.15);
-  color: #fbbf24;
-  border: 1px solid rgba(245, 158, 11, 0.3);
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fde68a;
 }
 
 .badge-admin {
-  background: rgba(99, 102, 241, 0.15);
-  color: #818cf8;
-  border: 1px solid rgba(99, 102, 241, 0.3);
+  background: #eaf3f9;
+  color: #2b82b5;
+  border: 1px solid #bae6fd;
 }
 
 .badge-operator {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.3);
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
 }
 
 /* Alerts and Messages */
@@ -218,15 +222,15 @@ h1, h2, h3, h4 {
 }
 
 .alert-error {
-  background: rgba(239, 68, 68, 0.12);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  color: #fca5a5;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
 }
 
 .alert-success {
-  background: rgba(16, 185, 129, 0.12);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  color: #6ee7b7;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #047857;
 }
 
 /* Custom Scrollbar */
@@ -238,9 +242,9 @@ h1, h2, h3, h4 {
   background: var(--bg-main);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--border-subtle);
+  background: #cbd5e1;
   border-radius: var(--radius-full);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
+  background: #94a3b8;
 }

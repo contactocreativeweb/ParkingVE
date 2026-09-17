@@ -100,7 +100,7 @@ const MainLayout: React.FC = () => {
         alignItems: 'center',
         justifyContent: 'center',
         padding: '1.5rem',
-        background: 'radial-gradient(ellipse at 50% 20%, rgba(99, 102, 241, 0.15), transparent 70%), var(--bg-main)',
+        background: 'radial-gradient(ellipse at 50% 20%, rgba(43, 130, 181, 0.12), transparent 70%), var(--bg-main)',
       }}>
         <LoginCard />
       </div>

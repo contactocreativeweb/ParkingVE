@@ -13,8 +13,8 @@ export default defineConfig({
         name: 'ParkingVE — Control de Estacionamiento',
         short_name: 'ParkingVE',
         description: 'PWA de gestión y control ágil para estacionamientos pequeños y medianos',
-        theme_color: '#0f172a',
-        background_color: '#0f172a',
+        theme_color: '#2b82b5',
+        background_color: '#edf2f7',
         display: 'standalone',
         orientation: 'portrait',
         icons: [

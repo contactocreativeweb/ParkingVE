@@ -48,7 +48,7 @@ export const UserHeader: React.FC = () => {
               width: '32px',
               height: '32px',
               borderRadius: '8px',
-              background: 'linear-gradient(135deg, #6366f1 0%, #06b6d4 100%)',
+              background: 'linear-gradient(135deg, #2b82b5 0%, #52a5d2 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
